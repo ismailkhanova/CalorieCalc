@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ResultActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <!-- Заголовок: "Ваша суточная норма калорий для поддержания веса" -->
+            <TextView
+                android:id="@+id/calories_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ваша суточная норма калорий для поддержания веса"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp"
+                android:gravity="center"/>
+
+            <!-- Результат: выводим количество калорий -->
+            <TextView
+                android:id="@+id/calories_result"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 ккал"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="32dp"
+                android:gravity="center"/>
+
+            <!-- Подпись "Ваша цель" -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ваша цель"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"/>
+
+            <!-- Радио-группа для выбора цели: поддержание, похудение или набор веса -->
+            <RadioGroup
+                android:id="@+id/goal_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp">
+
+                <!-- Выбор цели: Поддержание веса -->
+                <RadioButton
+                    android:id="@+id/maintain_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Поддержание веса" />
+
+                <!-- Выбор цели: Похудение -->
+                <RadioButton
+                    android:id="@+id/lose_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Похудение" />
+
+                <!-- Выбор цели: Набор веса -->
+                <RadioButton
+                    android:id="@+id/gain_weight"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Набор веса" />
+            </RadioGroup>
+
+            <!-- Кнопка "Начать", при нажатии переходит на главный экран -->
+            <Button
+                android:id="@+id/start_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Начать"
+                android:layout_marginTop="16dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
