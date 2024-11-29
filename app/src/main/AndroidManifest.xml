@@ -16,10 +16,10 @@
         android:theme="@style/Theme.CalorieCalc"
         tools:targetApi="31">
         <activity
-            android:name=".RegisterActivity"
+            android:name=".registration_user.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".registration_user.LoginActivity"
             android:exported="false" />
         <activity
             android:name=".ResultActivity"
