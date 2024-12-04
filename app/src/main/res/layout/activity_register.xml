@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:foregroundTint="#642C2C"
     tools:context=".registration_user.RegisterActivity">
 
     <!-- Карточка с формой -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_margin="16dp"
+        android:backgroundTint="@android:color/white"
         android:padding="16dp"
-        app:cardElevation="0dp"
         app:cardCornerRadius="12dp"
-        android:backgroundTint="@android:color/white">
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ScrollView
             android:layout_width="match_parent"
@@ -28,18 +28,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
                 <!-- Заголовок -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Регистрация"
-                    android:textSize="24sp"
+                    android:layout_marginBottom="32dp"
                     android:fontFamily="sans-serif-medium"
+                    android:text="Регистрация"
                     android:textColor="@color/black"
-                    android:layout_marginBottom="32dp" />
+                    android:textSize="24sp" />
 
                 <!-- Поле Email -->
                 <com.google.android.material.textfield.TextInputLayout
@@ -60,24 +60,24 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     app:boxBackgroundColor="@color/white"
-                    app:boxStrokeColor="@color/teal_700"
-                    android:layout_marginTop="16dp">
+                    app:boxStrokeColor="@color/teal_700">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/username_input"
                         android:layout_width="match_parent"
-                        android:hint="Введите имя пользователя"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:hint="Введите имя пользователя" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Поле Пароль -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     app:boxBackgroundColor="@color/white"
-                    app:boxStrokeColor="@color/teal_700"
-                    android:layout_marginTop="16dp">
+                    app:boxStrokeColor="@color/teal_700">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/password_input"
@@ -90,9 +90,9 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     app:boxBackgroundColor="@color/white"
-                    app:boxStrokeColor="@color/teal_700"
-                    android:layout_marginTop="16dp">
+                    app:boxStrokeColor="@color/teal_700">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/password_confirm"
@@ -107,23 +107,40 @@
                     android:id="@+id/register_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Зарегистрироваться"
-                    android:backgroundTint="#104AA8"
-                    android:textColor="@android:color/white"
                     android:layout_marginTop="32dp"
-                    android:fontFamily="sans-serif-medium" />
+                    android:backgroundTint="#104AA8"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="Зарегистрироваться"
+                    android:textColor="@android:color/white" />
 
                 <!-- Ссылка на Логин -->
                 <TextView
                     android:id="@+id/login_link"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Уже есть аккаунт? Войти"
-                    android:textColor="#104AA8"
                     android:layout_marginTop="16dp"
                     android:fontFamily="sans-serif"
+                    android:text="Уже есть аккаунт? Войти"
+                    android:textColor="#104AA8"
                     android:textSize="14sp" />
             </LinearLayout>
         </ScrollView>
     </com.google.android.material.card.MaterialCardView>
+
+    <FrameLayout
+        android:id="@+id/loading_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="#80000000"
+        android:gravity="center">
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        android:layout_gravity="center" />
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

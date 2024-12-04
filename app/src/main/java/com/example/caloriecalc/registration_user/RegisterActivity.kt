@@ -3,8 +3,11 @@ package com.example.caloriecalc.registration_user
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.FrameLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.example.caloriecalc.InputActivity
@@ -15,6 +18,8 @@ import com.google.firebase.database.FirebaseDatabase
 class RegisterActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
+    private lateinit var progressBar: ProgressBar
+    private lateinit var loadingLayout: FrameLayout
     private val emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\$"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +33,10 @@ class RegisterActivity : AppCompatActivity() {
         val passwordConfirm: EditText = findViewById(R.id.password_confirm)
         val signUpBtn: Button = findViewById(R.id.register_button)
         val logInLink: TextView = findViewById(R.id.login_link)
+
+        progressBar = findViewById(R.id.progress_bar)
+        loadingLayout = findViewById(R.id.loading_layout)
+
         logInLink.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
@@ -38,6 +47,7 @@ class RegisterActivity : AppCompatActivity() {
             val name = userName.text.toString()
             val password = passwordInput.text.toString()
             val passwordConf = passwordConfirm.text.toString()
+
 
             if(name.isEmpty() || email.isEmpty() || password.isEmpty() || passwordConf.isEmpty()){
                if(name.isEmpty()){
@@ -65,10 +75,10 @@ class RegisterActivity : AppCompatActivity() {
             else if(password!=passwordConf){
                 passwordConfirm.error="Пароль не совпадает"
                 Toast.makeText(this, "Пароль не совпадает", Toast.LENGTH_LONG).show()
-            }
-
-            else{
+            } else{
+                showLoading(true)
                auth.createUserWithEmailAndPassword(email,password).addOnCompleteListener {
+
                    if(it.isSuccessful){
                        val database =
                            database.reference.child("users").child(auth.currentUser!!.uid)
@@ -77,8 +87,11 @@ class RegisterActivity : AppCompatActivity() {
                            if(it.isSuccessful){
                                val intent=Intent(this, InputActivity::class.java)
                                startActivity(intent)
+                               showLoading(false)
+                               finish()
                            }
                            else{
+                               showLoading(false)
                                Toast.makeText(
                                    this,
                                    "Что-то пошло не так, попробуйте еще раз",
@@ -89,6 +102,17 @@ class RegisterActivity : AppCompatActivity() {
                    }
                }
             }
+        }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        // Управление видимостью прогресс-бара и затемнения
+        if (isLoading) {
+            loadingLayout.visibility = View.VISIBLE
+            progressBar.visibility = View.VISIBLE
+        } else {
+            loadingLayout.visibility = View.GONE
+            progressBar.visibility = View.GONE
         }
     }
 }

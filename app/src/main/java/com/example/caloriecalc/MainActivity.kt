@@ -7,11 +7,22 @@ import android.os.Bundle
 import android.widget.Button
 import com.example.caloriecalc.registration_user.LoginActivity
 import com.example.caloriecalc.registration_user.RegisterActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        auth = FirebaseAuth.getInstance()
+
+        val currentUser = auth.currentUser
+        if(currentUser != null){
+            val intent = Intent(this, MainScreenActivity::class.java)
+            startActivity(intent)
+            finish()
+        }else{
 
         // Находим кнопку по ID
         val loginButton = findViewById<Button>(R.id.login_button)
@@ -19,15 +30,14 @@ class MainActivity : AppCompatActivity() {
 
         // Добавляем обработчик нажатия
         loginButton.setOnClickListener {
-            // Переход на экран ввода данных
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
 
         signupButton.setOnClickListener {
-            // Переход на экран ввода данных
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
+        }
         }
     }
 }

@@ -9,12 +9,42 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.ArrayAdapter
+import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.DatabaseReference
 import kotlin.math.roundToInt
 
 class InputActivity : AppCompatActivity() {
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input)
+
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
+
+        val welcomeText: TextView = findViewById(R.id.welcome_text)
+
+
+        val currentUserUid = auth.currentUser?.uid
+        if (currentUserUid != null){
+            val userRef = database.child("users").child(currentUserUid)
+            userRef.child("userName").get().addOnSuccessListener{ snapshot ->
+                val userName = snapshot.getValue(String::class.java)
+                if(!userName.isNullOrEmpty()){
+                    welcomeText.text = "Добро пожаловать, $userName!"
+                } else{
+                    welcomeText.text = "Добро пожаловать, Гость!"
+                }
+            }.addOnFailureListener {
+                welcomeText.text = "Ошибка загрузки имени"
+            }
+        }
+
+
 
         // Настройка Spinner для выбора уровня активности
         val activitySpinner = findViewById<Spinner>(R.id.activity_spinner)
