@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_diary"
+        android:icon="@drawable/diary"
+        android:title="Дневник" />
+    <item
+        android:id="@+id/nav_book"
+        android:icon="@drawable/book"
+        android:title="Книга рецептов" />
+    <item
+        android:id="@+id/nav_stats"
+        android:icon="@drawable/stat"
+        android:title="Статистика" />
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/profile"
+        android:title="Профиль" />
+</menu>

@@ -3,6 +3,7 @@ package com.example.caloriecalc
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
@@ -10,6 +11,9 @@ import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import android.widget.Toast
+import com.example.caloriecalc.data.UserProfile
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DatabaseReference
@@ -32,17 +36,20 @@ class InputActivity : AppCompatActivity() {
         val currentUserUid = auth.currentUser?.uid
         if (currentUserUid != null){
             val userRef = database.child("users").child(currentUserUid)
-            userRef.child("userName").get().addOnSuccessListener{ snapshot ->
+            userRef.child("userName").get().addOnSuccessListener { snapshot ->
                 val userName = snapshot.getValue(String::class.java)
-                if(!userName.isNullOrEmpty()){
+                if (!userName.isNullOrEmpty()) {
                     welcomeText.text = "Добро пожаловать, $userName!"
-                } else{
+                } else {
                     welcomeText.text = "Добро пожаловать, Гость!"
                 }
             }.addOnFailureListener {
+                Log.e("FirebaseError", "Ошибка загрузки имени: ${it.message}")
                 welcomeText.text = "Ошибка загрузки имени"
+                Log.d("FirebasePath", "Путь: ${userRef.child("userName").toString()}")
             }
         }
+
 
 
 
@@ -72,13 +79,30 @@ class InputActivity : AppCompatActivity() {
             // Расчет калорий
             val calories = calculateCalories(height, weight, age, gender, activityLevel)
 
-            //Округление
-            val roundedCalories = calories.roundToInt()
+            val userProfile = UserProfile(
+                height = height,
+                weight = weight,
+                age = age,
+                gender = gender,
+                activityLevel = activityLevel,
+                calories = calories.roundToInt()
+            )
 
-            // Переход на экран с результатами
-            val intent = Intent(this, ResultActivity::class.java)
-            intent.putExtra("calories", roundedCalories)
-            startActivity(intent)
+            val currentUserid = auth.currentUser?.uid
+            if(currentUserid != null) {
+                val profileRef = database.child("profiles").child(currentUserid)
+                profileRef.setValue(userProfile).addOnCompleteListener { task ->
+                    if(task.isSuccessful){
+                        // Переход на экран с результатами
+                        val intent = Intent(this, ResultActivity::class.java)
+                        intent.putExtra("calories", calories.roundToInt())
+                        startActivity(intent)
+
+                    } else {
+                        Toast.makeText(this, "Ошибка сохранения данных профиля", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
     }
 
