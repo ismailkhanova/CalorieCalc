@@ -29,6 +29,15 @@ class DiaryFragment : Fragment() {
         setupRecyclerView()
         loadCurrentWeek()  // Загружаем текущую неделю
 
+        val openSearchButton: View = view.findViewById(R.id.openSearchButton)
+        openSearchButton.setOnClickListener {
+            // Открываем новый фрагмент поиска и закрываем текущий
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, SearchProductFragment()) // Меняем текущий фрагмент
+                .addToBackStack(null) // Добавляем в backstack для возможности вернуться назад
+                .commit()
+        }
+
         return view
     }
 
