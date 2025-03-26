@@ -1,4 +1,4 @@
-package com.example.caloriecalc
+package adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.caloriecalc.data.CalendarDay
 import android.view.ViewGroup
+import com.example.caloriecalc.R
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
