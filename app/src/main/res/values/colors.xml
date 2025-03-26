@@ -9,9 +9,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="teal_7001">#00796B</color>
     <color name="white1">#FFFFFF</color>
-    <color name="black1">#000000</color>
+    <color name="black1">#C81D1D1D</color>
     <color name="active_color">#1457BF</color>
-    <color name="inactive_color">#B3000000</color>
+    <color name="inactive_color">#7F000000</color>
     <color name="blue">#90C2F6</color>
     <color name="light_gray">#D1CECE</color>
+    <color name="whiteblue">#C3DBFF</color>
+    <color name="grey">#818181</color>
 </resources>

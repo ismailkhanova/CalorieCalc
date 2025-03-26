@@ -1,16 +1,21 @@
 package com.example.caloriecalc.fragments
 
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.caloriecalc.DaysAdapter
+import com.example.caloriecalc.adapters.DaysAdapter
 import com.example.caloriecalc.R
+import com.example.caloriecalc.adapters.MealAdapter
 import com.example.caloriecalc.data.CalendarDay
+import com.example.caloriecalc.data.Meal
+import com.example.caloriecalc.data.Product
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -18,18 +23,29 @@ class DiaryFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var daysAdapter: DaysAdapter
+    private lateinit var recyclerViewMeals: RecyclerView
+    private lateinit var mealAdapter: MealAdapter
+    private val meals = mutableListOf( // Добавляем meals в поле класса, чтобы к нему можно было обращаться
+        Meal("Завтрак"),
+        Meal("Обед"),
+        Meal("Ужин"),
+        Meal("Перекус")
+    )
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_diary, container, false)
         recyclerView = view.findViewById(R.id.recyclerViewDays)
+        recyclerViewMeals = view.findViewById(R.id.recyclerViewMeals)
 
         setupRecyclerView()
+        setupMealsRecyclerView()
         loadCurrentWeek()  // Загружаем текущую неделю
 
-        val openSearchButton: View = view.findViewById(R.id.openSearchButton)
+        val openSearchButton: ImageView = view.findViewById(R.id.search_button)
         openSearchButton.setOnClickListener {
             // Открываем новый фрагмент поиска и закрываем текущий
             parentFragmentManager.beginTransaction()
@@ -37,6 +53,17 @@ class DiaryFragment : Fragment() {
                 .addToBackStack(null) // Добавляем в backstack для возможности вернуться назад
                 .commit()
         }
+
+        parentFragmentManager.setFragmentResultListener("product_added", this) { _, bundle ->
+            val mealName = bundle.getString("meal_name")
+            val newProduct = bundle.getParcelable("new_product", Product::class.java)
+
+
+            if (mealName != null && newProduct != null) {
+                addProductToMeal(mealName, newProduct)
+            }
+        }
+
 
         return view
     }
@@ -48,6 +75,42 @@ class DiaryFragment : Fragment() {
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
             adapter = daysAdapter
+        }
+    }
+
+    private fun setupMealsRecyclerView() {
+        mealAdapter = MealAdapter(meals) { selectedMeal ->
+            val bundle = Bundle().apply {
+                putString("meal_name", selectedMeal.name)
+            }
+            val searchFragment = SearchProductFragment()
+            searchFragment.arguments = bundle
+
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, searchFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
+        recyclerViewMeals.layoutManager = LinearLayoutManager(requireContext())
+        recyclerViewMeals.adapter = mealAdapter
+        recyclerViewMeals.isNestedScrollingEnabled = true
+
+    }
+
+    // 🔥 Метод для добавления продукта в нужный Meal
+    private fun addProductToMeal(mealName: String, newProduct: Product) {
+        val meal = meals.find { it.name == mealName }
+        meal?.let {
+            it.products.add(newProduct) // Добавляем продукт в приём пищи
+
+            // 🔥 Обновляем суммарные значения калорий и БЖУ
+            it.getTotalCalories()
+            it.getTotalProtein()
+            it.getTotalFat()
+            it.getTotalCarbs()
+
+            mealAdapter.notifyDataSetChanged() // 🔄 Обновляем RecyclerView
         }
     }
 
@@ -78,4 +141,5 @@ class DiaryFragment : Fragment() {
     private fun loadFoodDataForDate(date: LocalDate) {
         // Логика для загрузки данных для выбранной даты
     }
+
 }

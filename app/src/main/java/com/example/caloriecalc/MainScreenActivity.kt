@@ -2,9 +2,6 @@ package com.example.caloriecalc
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
-import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.caloriecalc.databinding.ActivityMainBinding
@@ -13,10 +10,7 @@ import com.example.caloriecalc.fragments.DiaryFragment
 import com.example.caloriecalc.fragments.ProfileFragment
 import com.example.caloriecalc.fragments.RecipeFragment
 import com.example.caloriecalc.fragments.StatisticFragment
-import com.example.caloriecalc.ui.theme.CalorieCalcTheme
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+
 
 class MainScreenActivity : AppCompatActivity() {
 
@@ -51,4 +45,4 @@ class MainScreenActivity : AppCompatActivity() {
         fragmentTransaction.replace(R.id.fragment_container,fragment)
         fragmentTransaction.commit()
     }
-    }
+}

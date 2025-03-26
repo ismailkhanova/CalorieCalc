@@ -77,27 +77,7 @@ class ProfileFragment : Fragment() {
             if (currentUserUid != null) {
                 val userRef = database.child("users").child(currentUserUid)
 
-//                userRef.child("userName").get().addOnSuccessListener { snapshot ->
-//                    val userName = snapshot.getValue(String::class.java)
-//                    if (!userName.isNullOrEmpty()) {
-//                        username.text = userName
-//                        editor.putString("userName", userName).apply()
-//                    }
-//                }.addOnFailureListener {
-//                    Log.e("FirebaseError", "Ошибка загрузки имени: ${it.message}")
-//                    username.text = "Ошибка загрузки имени"
-//                }
-//                userRef.child("email").get().addOnSuccessListener { snapshot ->
-//                    val email = snapshot.getValue(String::class.java)
-//                    if (!email.isNullOrEmpty()) {
-//                        user_email.text = email
-//                        editor.putString("email", email).apply()
-//                    }
-//                }.addOnFailureListener {
-//                    Log.e("FirebaseError", "Ошибка загрузки почты: ${it.message}")
-//                    user_email.text = "Ошибка загрузки почты"
-//                }
-                // Слушаем изменения данных пользователя в реальном времени
+
                 userRef.addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
                         // Обновляем имя пользователя
