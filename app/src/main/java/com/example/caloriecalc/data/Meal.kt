@@ -2,7 +2,8 @@ package com.example.caloriecalc.data
 
 data class Meal(
     val name: String, // Название приема пищи (Завтрак, Обед и т. д.)
-    val products: MutableList<Product> = mutableListOf() // Список добавленных продуктов
+    val products: MutableList<Product> = mutableListOf(), // Список добавленных продуктов
+    var isExpanded: Boolean = false
 ) {
     // Функции для подсчёта общей калорийности и БЖУ
     fun getTotalCalories(): Double {

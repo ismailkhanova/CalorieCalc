@@ -1,6 +1,7 @@
 package com.example.caloriecalc.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -75,7 +76,7 @@ class SearchProductFragment : Fragment() {
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
-                query?.let { searchProdcuts(it) }
+                query?.let { searchProducts(it) }
                 return true
             }
 
@@ -88,7 +89,7 @@ class SearchProductFragment : Fragment() {
     }
 
     private fun openProductFragment(product: Product) {
-        val mealName = arguments?.getString("meal_name")
+        val mealName = arguments?.getString("meal_name") ?: "Завтрак"
         val fragment = ProductFragment().apply {
             arguments = Bundle().apply {
                 putString("meal_name", mealName)
@@ -107,7 +108,7 @@ class SearchProductFragment : Fragment() {
             .commit()
     }
 
-    private fun searchProdcuts(query: String){
+    private fun searchProducts(query: String){
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = api.searchProducts(query)
@@ -115,6 +116,7 @@ class SearchProductFragment : Fragment() {
                     adapter.updateData(response.items)
                 }
             } catch (e: Exception) {
+                Log.e("API_EXCEPTION", "Ошибка при загрузке данных", e)
                 withContext(Dispatchers.Main) {
                     Toast.makeText(requireContext(), "Ошибка загрузки данных", Toast.LENGTH_SHORT).show()
                 }

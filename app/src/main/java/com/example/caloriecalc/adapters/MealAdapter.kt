@@ -26,6 +26,10 @@ class MealAdapter (
     override fun onBindViewHolder(holder: MealViewHolder, position: Int ) {
         val meal = meals[position]
         holder.bind(meal)
+        holder.itemView.findViewById<ImageView>(R.id.expandArrow).setOnClickListener {
+            meal.isExpanded = !meal.isExpanded // Меняем состояние
+            notifyItemChanged(position) // Обновляем элемент
+        }
     }
 
     override fun getItemCount(): Int = meals.size
@@ -48,6 +52,14 @@ class MealAdapter (
             mealProteinTextView.text = "Б: ${String.format("%.2f", meal.getTotalProtein())} г"
             mealFatTextView.text = "Ж: ${String.format("%.2f", meal.getTotalFat())} г"
             mealCarbsTextView.text = "У: ${String.format("%.2f", meal.getTotalCarbs())} г"
+            val expandArrow: ImageView = itemView.findViewById(R.id.expandArrow)
+            val productList: RecyclerView = itemView.findViewById(R.id.recyclerProducts)
+            // Показываем/скрываем список продуктов
+            productList.visibility = if (meal.isExpanded) View.VISIBLE else View.GONE
+
+            // Анимация поворота стрелки
+            val rotationAngle = if (meal.isExpanded) 180f else 0f
+            expandArrow.animate().rotation(rotationAngle).setDuration(200).start()
 
             val productListAdapter = ProductListAdapter(meal.products)
             productsRecyclerView.apply {
