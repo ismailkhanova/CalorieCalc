@@ -12,17 +12,22 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.core.os.bundleOf
+import androidx.lifecycle.ViewModelProvider
 import com.example.caloriecalc.R
+import com.example.caloriecalc.data.DiaryViewModel
 import com.example.caloriecalc.data.Product
+import java.time.LocalDate
 
 
 class ProductFragment : Fragment() {
+    private lateinit var viewModel: DiaryViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        viewModel = ViewModelProvider(requireActivity()).get(DiaryViewModel::class.java)
         val binding = inflater.inflate(R.layout.fragment_product, container, false)
-
+        val mealName = arguments?.getString("meal_name") ?: "Завтрак"
         val productName = arguments?.getString("product_name") ?: "Неизвестно"
         val productCalories = arguments?.getDouble("product_calories") ?: 0.0
         val productProtein = arguments?.getDouble("protein") ?: 0.0
@@ -74,13 +79,14 @@ class ProductFragment : Fragment() {
                 fat_total_g = productFat * weight / 100,
                 carbohydrates_total_g = productCarbs * weight / 100
             )
-            val mealName = arguments?.getString("meal_name")
-            parentFragmentManager.setFragmentResult(
-                "product_added",
-                bundleOf(
-                    "meal_name" to mealName,
-                    "new_product" to newProduct as Parcelable)
-            )
+            val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
+            viewModel.addProduct(selectedDate, mealName, newProduct)
+//            parentFragmentManager.setFragmentResult(
+//                "product_added",
+//                bundleOf(
+//                    "meal_name" to mealName,
+//                    "new_product" to newProduct as Parcelable)
+//            )
 
             parentFragmentManager.popBackStack()
 

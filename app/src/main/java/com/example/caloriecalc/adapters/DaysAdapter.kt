@@ -7,41 +7,45 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.caloriecalc.data.CalendarDay
 import android.view.ViewGroup
 import com.example.caloriecalc.R
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-
 
 class DaysAdapter(
     private val onDaySelected: (CalendarDay) -> Unit
 ) : RecyclerView.Adapter<DaysAdapter.DayViewHolder>() {
 
     private val daysList = mutableListOf<CalendarDay>()
-    private var selectedPosition = -1
+    var currentSelectedDate: LocalDate? = null
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+    private val dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEE", Locale("ru"))
 
     fun submitList(newDays: List<CalendarDay>) {
         daysList.clear()
         daysList.addAll(newDays)
 
-        // Снимаем выделение с сегодняшнего дня, если оно есть
-        val todayPosition = newDays.indexOfFirst { it.isToday }
-        if (todayPosition != -1 && selectedPosition == todayPosition) {
-            selectedPosition = -1
+        // Автоматически выделяем сегодняшний день при первой загрузке
+        if (currentSelectedDate == null) {
+            currentSelectedDate = newDays.firstOrNull { it.isToday }?.date
         }
-
-        // Найдем позицию сегодняшнего дня и выделим его по умолчанию
-        selectedPosition = newDays.indexOfFirst { it.isToday }
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(
-            R.layout.item_calendar_day, parent, false
-        )
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_calendar_day, parent, false)
         return DayViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
-        holder.bind(daysList[position], position)
+        val day = daysList[position]
+        val isSelected = day.date == currentSelectedDate
+        val isToday = day.isToday
+
+        holder.bind(day, isSelected, isToday)
     }
 
     override fun getItemCount(): Int = daysList.size
@@ -50,26 +54,35 @@ class DaysAdapter(
         private val dayText: TextView = itemView.findViewById(R.id.dayText)
         private val dateText: TextView = itemView.findViewById(R.id.dateText)
 
-        private val dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEE", Locale("ru"))
-
-        fun bind(day: CalendarDay, position: Int) {
-            dayText.text = day.date.format(dayOfWeekFormatter) // "ПН", "ВТ", и т.д.
+        fun bind(day: CalendarDay, isSelected: Boolean, isToday: Boolean) {
+            // Устанавливаем текст
+            dayText.text = day.date.format(dayOfWeekFormatter) // "ПН", "ВТ" и т.д.
             dateText.text = day.date.dayOfMonth.toString()
 
-            // Выделение выбранного дня
-            itemView.isSelected = position == selectedPosition || day.isToday
+            // Устанавливаем выделение
+            itemView.isSelected = isSelected
             itemView.background = itemView.context.getDrawable(
-                if (position == selectedPosition) R.drawable.calendar_day_background
-                else R.drawable.calendar_day_background_default
+                when {
+                    isSelected -> R.drawable.calendar_day_background
+                    isToday -> R.drawable.calendar_day_background_today
+                    else -> R.drawable.calendar_day_background_default
+                }
             )
 
+            // Обработка клика
             itemView.setOnClickListener {
-                // Снимаем выделение с предыдущего дня
-                val previousSelected = selectedPosition
-                selectedPosition = position
-                notifyItemChanged(previousSelected) // Снимаем выделение с предыдущего дня
-                notifyItemChanged(position) // Выделяем новый день
-                onDaySelected(day)
+                if (!isSelected) { // Кликаем только по невыбранным дням
+                    val previousSelectedDate = currentSelectedDate
+                    currentSelectedDate = day.date
+
+                    // Обновляем только предыдущий и текущий элементы
+                    daysList.indexOfFirst { it.date == previousSelectedDate }.takeIf { it != -1 }?.let {
+                        notifyItemChanged(it)
+                    }
+                    notifyItemChanged(adapterPosition)
+
+                    onDaySelected(day)
+                }
             }
         }
     }

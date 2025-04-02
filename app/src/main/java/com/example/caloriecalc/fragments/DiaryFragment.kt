@@ -8,19 +8,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.caloriecalc.adapters.DaysAdapter
 import com.example.caloriecalc.R
 import com.example.caloriecalc.adapters.MealAdapter
 import com.example.caloriecalc.data.CalendarDay
+import com.example.caloriecalc.data.DiaryViewModel
 import com.example.caloriecalc.data.Meal
 import com.example.caloriecalc.data.Product
 import java.time.DayOfWeek
 import java.time.LocalDate
 
 class DiaryFragment : Fragment() {
-
+    private  lateinit var viewModel: DiaryViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var daysAdapter: DaysAdapter
     private lateinit var recyclerViewMeals: RecyclerView
@@ -38,12 +40,20 @@ class DiaryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_diary, container, false)
+        viewModel = ViewModelProvider(requireActivity()).get(DiaryViewModel::class.java)
         recyclerView = view.findViewById(R.id.recyclerViewDays)
         recyclerViewMeals = view.findViewById(R.id.recyclerViewMeals)
 
         setupRecyclerView()
         setupMealsRecyclerView()
         loadCurrentWeek()  // Загружаем текущую неделю
+
+        viewModel.selectedDate.observe(viewLifecycleOwner) { date ->
+            if (daysAdapter.currentSelectedDate != date) {
+                daysAdapter.currentSelectedDate = date
+            }
+            updateMealsForDate(date)
+        }
 
         val openSearchButton: ImageView = view.findViewById(R.id.search_button)
         openSearchButton.setOnClickListener {
@@ -60,22 +70,37 @@ class DiaryFragment : Fragment() {
 
 
             if (mealName != null && newProduct != null) {
-                addProductToMeal(mealName, newProduct)
+                val selectedDate = daysAdapter.currentSelectedDate ?: LocalDate.now()
+                viewModel.addProduct(selectedDate, mealName, newProduct)
             }
         }
-
 
         return view
     }
 
+    private fun updateMealsForDate(date: LocalDate) {
+        val mealsData = viewModel.getFoodForDate(date)
+        meals.forEach { meal ->
+            meal.products.clear()
+            meal.products.addAll(mealsData[meal.name] ?: emptyList())
+        }
+        mealAdapter.notifyDataSetChanged()
+    }
+
     private fun setupRecyclerView() {
         daysAdapter = DaysAdapter { selectedDay ->
-            loadFoodDataForDate(selectedDay.date)
+            daysAdapter.currentSelectedDate = selectedDay.date
+            viewModel.setSelectedDate(selectedDay.date)
+            updateMealsForDate(selectedDay.date)
         }
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
             adapter = daysAdapter
         }
+
+        val today = LocalDate.now()
+        daysAdapter.currentSelectedDate = today
+        viewModel.setSelectedDate(today)
     }
 
     private fun setupMealsRecyclerView() {
@@ -140,6 +165,14 @@ class DiaryFragment : Fragment() {
 
     private fun loadFoodDataForDate(date: LocalDate) {
         // Логика для загрузки данных для выбранной даты
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.selectedDate.value?.let { currentDate ->
+            daysAdapter.currentSelectedDate = currentDate
+            daysAdapter.notifyDataSetChanged()
+        }
     }
 
 }
