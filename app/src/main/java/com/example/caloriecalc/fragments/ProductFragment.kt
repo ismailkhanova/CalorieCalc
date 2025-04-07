@@ -81,12 +81,7 @@ class ProductFragment : Fragment() {
             )
             val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
             viewModel.addProduct(selectedDate, mealName, newProduct)
-//            parentFragmentManager.setFragmentResult(
-//                "product_added",
-//                bundleOf(
-//                    "meal_name" to mealName,
-//                    "new_product" to newProduct as Parcelable)
-//            )
+
 
             parentFragmentManager.popBackStack()
 
