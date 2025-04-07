@@ -1,18 +1,24 @@
 package com.example.caloriecalc.adapters
 
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.caloriecalc.data.CalendarDay
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.example.caloriecalc.R
+import com.example.caloriecalc.data.DiaryViewModel
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class DaysAdapter(
-    private val onDaySelected: (CalendarDay) -> Unit
+    private val onDaySelected: (CalendarDay) -> Unit,
+    private val onDateSelected: (LocalDate) -> Unit
 ) : RecyclerView.Adapter<DaysAdapter.DayViewHolder>() {
 
     private val daysList = mutableListOf<CalendarDay>()
@@ -39,6 +45,7 @@ class DaysAdapter(
             .inflate(R.layout.item_calendar_day, parent, false)
         return DayViewHolder(view)
     }
+
 
     override fun onBindViewHolder(holder: DayViewHolder, position: Int) {
         val day = daysList[position]
@@ -82,6 +89,7 @@ class DaysAdapter(
                     notifyItemChanged(adapterPosition)
 
                     onDaySelected(day)
+                    onDateSelected(day.date)
                 }
             }
         }

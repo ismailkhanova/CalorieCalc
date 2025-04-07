@@ -1,5 +1,6 @@
 package com.example.caloriecalc.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.Editable
@@ -11,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import com.example.caloriecalc.R
