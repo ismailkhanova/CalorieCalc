@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/profileFragment">
+
+    <!-- Фрагмент для Профиля -->
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.caloriecalc.fragments.ProfileFragment"
+        android:label="ProfileFragment" />
+
+    <!-- Фрагмент для Дневника -->
+    <fragment
+        android:id="@+id/diaryFragment"
+        android:name="com.example.caloriecalc.fragments.DiaryFragment"
+        android:label="DiaryFragment"
+        tools:layout="@layout/fragment_diary" >
+        <!-- Пример действия для перехода в другой фрагмент -->
+        <action
+            android:id="@+id/action_diaryFragment_to_searchProductFragment"
+            app:destination="@id/searchProductFragment"
+            app:popUpTo="@id/diaryFragment"
+            app:popUpToInclusive="false"/>
+        <argument android:name="meal_name" app:argType="string" />
+    </fragment>
+
+    <!-- Фрагмент для Рецептов -->
+    <fragment
+        android:id="@+id/recipeFragment"
+        android:name="com.example.caloriecalc.fragments.RecipeFragment"
+        android:label="RecipeFragment" >
+        <action
+            android:id="@+id/action_recipeFragment_to_createRecipeFragment"
+            app:destination="@id/createRecipeFragment" />
+    </fragment>
+
+    <!-- Фрагмент для Статистики -->
+    <fragment
+        android:id="@+id/statisticFragment"
+        android:name="com.example.caloriecalc.fragments.StatisticFragment"
+        android:label="StatisticFragment"
+        tools:layout="@layout/fragment_statistic" />
+
+    <!-- Фрагмент для Продукта -->
+    <fragment
+        android:id="@+id/productFragment"
+        android:name="com.example.caloriecalc.fragments.ProductFragment"
+        android:label="ProductFragment">
+        <argument android:name="meal_name" app:argType="string" />
+        <argument android:name="product_name" app:argType="string" />
+        <argument android:name="product_calories" app:argType="float" android:defaultValue="0"/>
+        <argument android:name="protein" app:argType="float" android:defaultValue="0"/>
+        <argument android:name="fat" app:argType="float" android:defaultValue="0"/>
+        <argument android:name="carbs" app:argType="float" android:defaultValue="0"/>
+    </fragment>
+
+    <!-- Фрагмент для Создания Рецепта -->
+    <fragment
+        android:id="@+id/createRecipeFragment"
+        android:name="com.example.caloriecalc.fragments.CreateRecipeFragment"
+        android:label="CreateRecipeFragment" >
+        <action
+            android:id="@+id/action_createRecipeFragment_to_searchProductFragment"
+            app:destination="@id/searchProductFragment" />
+    </fragment>
+
+    <!-- Фрагмент для Поиска Продукта -->
+    <fragment
+        android:id="@+id/searchProductFragment"
+        android:name="com.example.caloriecalc.fragments.SearchProductFragment"
+        android:label="SearchProductFragment" >
+        <action
+            android:id="@+id/action_searchProductFragment_to_productFragment"
+            app:destination="@id/productFragment" />
+        <argument android:name="meal_name" app:argType="string" />
+    </fragment>
+
+</navigation>

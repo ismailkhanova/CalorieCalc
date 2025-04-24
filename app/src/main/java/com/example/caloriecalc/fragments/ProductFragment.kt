@@ -15,27 +15,41 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.caloriecalc.R
 import com.example.caloriecalc.data.DiaryViewModel
 import com.example.caloriecalc.data.Product
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.time.LocalDate
+import kotlin.math.round
 
 
 class ProductFragment : Fragment() {
     private lateinit var viewModel: DiaryViewModel
+
+    private val decimalFormat = DecimalFormat("#.##").apply {
+        roundingMode = RoundingMode.DOWN
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         viewModel = ViewModelProvider(requireActivity()).get(DiaryViewModel::class.java)
         val binding = inflater.inflate(R.layout.fragment_product, container, false)
+
+        fun Double.roundToTwo(): Double {
+            return decimalFormat.format(this).replace(",", ".").toDouble()
+        }
+
+
+        // Convert float arguments back to double for calculations
         val mealName = arguments?.getString("meal_name") ?: "Завтрак"
         val productName = arguments?.getString("product_name") ?: "Неизвестно"
-        val productCalories = arguments?.getDouble("product_calories") ?: 0.0
-        val productProtein = arguments?.getDouble("protein") ?: 0.0
-        val productFat = arguments?.getDouble("fat") ?: 0.0
-        val productCarbs = arguments?.getDouble("carbs") ?: 0.0
-
+        val productCalories = arguments?.getFloat("product_calories")?.toDouble() ?: 0.0
+        val productProtein = arguments?.getFloat("protein")?.toDouble() ?: 0.0
+        val productFat = arguments?.getFloat("fat")?.toDouble() ?: 0.0
+        val productCarbs = arguments?.getFloat("carbs")?.toDouble() ?: 0.0
 
         val weightInput = binding.findViewById<EditText>(R.id.weightInput)
         val saveButton = binding.findViewById<Button>(R.id.saveButton)
@@ -53,11 +67,12 @@ class ProductFragment : Fragment() {
 
         fun updateNutrition(weight: Double) {
             val factor = weight / 100
-            caloriesTextView.text = "Калории: ${String.format("%.2f", productCalories * factor)} ккал"
-            proteinTextView.text = "Белки: ${String.format("%.2f", productProtein * factor)} г"
-            fatTextView.text = "Жиры: ${String.format("%.2f", productFat * factor)} г"
-            carbsTextView.text = "Углеводы: ${String.format("%.2f", productCarbs * factor)} г"
+            caloriesTextView.text = "Калории: ${decimalFormat.format(productCalories * factor)} ккал"
+            proteinTextView.text = "Белки: ${decimalFormat.format(productProtein * factor)} г"
+            fatTextView.text = "Жиры: ${decimalFormat.format(productFat * factor)} г"
+            carbsTextView.text = "Углеводы: ${decimalFormat.format(productCarbs * factor)} г"
         }
+
         updateNutrition(100.0)
 
         weightInput.addTextChangedListener(object : TextWatcher {
@@ -70,30 +85,28 @@ class ProductFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
+
+
         saveButton.setOnClickListener {
             val weight = weightInput.text.toString().toDoubleOrNull() ?: 100.0
 
             val newProduct = Product(
                 name = productName,
-                weight = weight,
-                calories = productCalories * weight / 100,
-                protein_g = productProtein * weight / 100,
-                fat_total_g = productFat * weight / 100,
-                carbohydrates_total_g = productCarbs * weight / 100
+                weight = weight.roundToTwo(),
+                calories = (productCalories * weight / 100).roundToTwo(),
+                protein_g = (productProtein * weight / 100).roundToTwo(),
+                fat_total_g = (productFat * weight / 100).roundToTwo(),
+                carbohydrates_total_g = (productCarbs * weight / 100).roundToTwo()
             )
+
+
             val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
             viewModel.addProduct(selectedDate, mealName, newProduct)
 
-
-            parentFragmentManager.popBackStack()
-
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, SearchProductFragment()) // Заменяет текущий фрагмент на SearchProductFragment
-                .addToBackStack(null) // Добавляет в стек, чтобы можно было вернуться назад
-                .commit()
+            // Navigate back to SearchProductFragment using NavController
+            findNavController().navigateUp()
         }
 
         return binding
     }
-
 }

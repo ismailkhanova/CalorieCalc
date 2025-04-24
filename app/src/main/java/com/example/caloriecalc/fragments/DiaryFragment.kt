@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.caloriecalc.adapters.DaysAdapter
@@ -27,7 +28,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 
 class DiaryFragment : Fragment() {
-    private  lateinit var viewModel: DiaryViewModel
+    private lateinit var viewModel: DiaryViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var daysAdapter: DaysAdapter
     private lateinit var recyclerViewMeals: RecyclerView
@@ -83,20 +84,15 @@ class DiaryFragment : Fragment() {
 
         viewModel.loadInitialWeekData()
 
-
         val openSearchButton: ImageView = view.findViewById(R.id.search_button)
         openSearchButton.setOnClickListener {
-            // Открываем новый фрагмент поиска и закрываем текущий
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, SearchProductFragment()) // Меняем текущий фрагмент
-                .addToBackStack(null) // Добавляем в backstack для возможности вернуться назад
-                .commit()
+            // Открываем новый фрагмент поиска с помощью NavController
+            findNavController().navigate(R.id.action_diaryFragment_to_searchProductFragment)
         }
 
         parentFragmentManager.setFragmentResultListener("product_added", this) { _, bundle ->
             val mealName = bundle.getString("meal_name")
             val newProduct = bundle.getParcelable("new_product", Product::class.java)
-
 
             if (mealName != null && newProduct != null) {
                 val selectedDate = daysAdapter.currentSelectedDate ?: LocalDate.now()
@@ -165,13 +161,12 @@ class DiaryFragment : Fragment() {
     private fun setupRecyclerView() {
         daysAdapter = DaysAdapter (
             onDaySelected = { selectedDay ->
-           Log.d("DiaryFragment", "Day selected: ${selectedDay.date}")
-        },
-        onDateSelected = { date ->
-            viewModel.setSelectedDate(date)
-
-        }
-    )
+                Log.d("DiaryFragment", "Day selected: ${selectedDay.date}")
+            },
+            onDateSelected = { date ->
+                viewModel.setSelectedDate(date)
+            }
+        )
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
             adapter = daysAdapter
@@ -187,19 +182,17 @@ class DiaryFragment : Fragment() {
             val bundle = Bundle().apply {
                 putString("meal_name", selectedMeal.name)
             }
-            val searchFragment = SearchProductFragment()
-            searchFragment.arguments = bundle
 
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, searchFragment)
-                .addToBackStack(null)
-                .commit()
+            // Используем NavController для перехода с аргументами
+            findNavController().navigate(
+                R.id.action_diaryFragment_to_searchProductFragment,
+                bundle
+            )
         }
 
         recyclerViewMeals.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewMeals.adapter = mealAdapter
         recyclerViewMeals.isNestedScrollingEnabled = true
-
     }
 
     // 🔥 Метод для добавления продукта в нужный Meal
@@ -249,5 +242,4 @@ class DiaryFragment : Fragment() {
             daysAdapter.notifyDataSetChanged()
         }
     }
-
 }

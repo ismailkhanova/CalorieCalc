@@ -12,6 +12,7 @@ import com.example.caloriecalc.R
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.SearchView
+import androidx.navigation.fragment.findNavController
 import com.example.caloriecalc.adapters.ProductAdapter
 import com.example.caloriecalc.api.CaloriesNinjasApi
 import com.example.caloriecalc.data.Product
@@ -20,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.http.Query
+import kotlin.math.roundToInt
 
 
 class SearchProductFragment : Fragment() {
@@ -42,12 +44,8 @@ class SearchProductFragment : Fragment() {
         cancelBtn = binding.findViewById(R.id.btnCancel)
 
         cancelBtn.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, DiaryFragment())
-                .addToBackStack(null) // Добавляет в стек, чтобы можно было вернуться назад
-                .commit()
+            findNavController().navigateUp() // Navigate back to previous fragment
         }
-
 
         // Делаем так, чтобы при нажатии в любое место строки поиска она сразу активировалась
         searchView.setOnClickListener {
@@ -55,22 +53,20 @@ class SearchProductFragment : Fragment() {
             searchView.requestFocus()
         }
 
-// Если поле поиска получает фокус, оно должно развернуться
+        // Если поле поиска получает фокус, оно должно развернуться
         searchView.setOnQueryTextFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 searchView.isIconified = false
             }
         }
 
-// Принудительно фокусируем строку поиска, чтобы избежать двойного нажатия
+        // Принудительно фокусируем строку поиска, чтобы избежать двойного нажатия
         searchView.post {
             searchView.requestFocus()
         }
 
-
         adapter = ProductAdapter(emptyList()) { selectedProduct ->
             openProductFragment(selectedProduct)
-
         }
         recyclerView.adapter = adapter
 
@@ -90,25 +86,28 @@ class SearchProductFragment : Fragment() {
 
     private fun openProductFragment(product: Product) {
         val mealName = arguments?.getString("meal_name") ?: "Завтрак"
-        val fragment = ProductFragment().apply {
-            arguments = Bundle().apply {
-                putString("meal_name", mealName)
-                putString("product_name", product.name)
-                putDouble("product_calories", product.calories)
-                putDouble("protein", product.protein_g)
-                putDouble("fat", product.fat_total_g)
-                putDouble("carbs", product.carbohydrates_total_g)
+        val args = Bundle().apply {
+            putString("meal_name", mealName)
+            putString("product_name", product.name)
+            putFloat("product_calories", roundToTwoDecimals(product.calories).toFloat())
+            putFloat("protein", roundToTwoDecimals(product.protein_g).toFloat())
+            putFloat("fat", roundToTwoDecimals(product.fat_total_g).toFloat())
+            putFloat("carbs", roundToTwoDecimals(product.carbohydrates_total_g).toFloat())
 
-            }
-        }
-
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
     }
 
-    private fun searchProducts(query: String){
+        // Navigate to ProductFragment with NavController
+        findNavController().navigate(
+            R.id.action_searchProductFragment_to_productFragment,
+            args
+        )
+    }
+
+    private fun roundToTwoDecimals(value: Double): Double {
+        return (value * 100).roundToInt() / 100.0
+    }
+
+    private fun searchProducts(query: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = api.searchProducts(query)

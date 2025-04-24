@@ -17,3 +17,13 @@ data class Product(
     // Добавляем пустой конструктор для Firebase
     constructor() : this("", 0.0, 0.0, 0.0, 0.0, 0.0)
 }
+
+fun Product.toIngredient(weight: Double): Ingredient {
+    val caloriesPerIngredient = (this.calories / 100) * weight
+    return Ingredient(
+        name = this.name,
+        weight = weight,
+        caloriesPer100g = caloriesPerIngredient // Расчёт калорий на введённый вес
+    )
+}
+
