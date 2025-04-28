@@ -48,6 +48,12 @@
         android:id="@+id/productFragment"
         android:name="com.example.caloriecalc.fragments.ProductFragment"
         android:label="ProductFragment">
+
+        <argument
+            android:name="isForRecipe"
+            app:argType="boolean"
+            android:defaultValue="false" />
+
         <argument android:name="meal_name" app:argType="string" />
         <argument android:name="product_name" app:argType="string" />
         <argument android:name="product_calories" app:argType="float" android:defaultValue="0"/>
@@ -63,7 +69,14 @@
         android:label="CreateRecipeFragment" >
         <action
             android:id="@+id/action_createRecipeFragment_to_searchProductFragment"
-            app:destination="@id/searchProductFragment" />
+            app:destination="@id/searchProductFragment"
+            app:popUpTo="@id/createRecipeFragment"
+            app:popUpToInclusive="false"/>
+        <argument
+            android:name="isForRecipe"
+            app:argType="boolean"
+            android:defaultValue="false" />
+
     </fragment>
 
     <!-- Фрагмент для Поиска Продукта -->
@@ -75,6 +88,10 @@
             android:id="@+id/action_searchProductFragment_to_productFragment"
             app:destination="@id/productFragment" />
         <argument android:name="meal_name" app:argType="string" />
+        <argument
+            android:name="isForRecipe"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 
 </navigation>

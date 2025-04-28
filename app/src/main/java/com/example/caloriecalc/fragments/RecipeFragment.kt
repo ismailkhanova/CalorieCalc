@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.navigation.fragment.findNavController
 import com.example.caloriecalc.R
 
 
@@ -25,10 +26,8 @@ class RecipeFragment : Fragment() {
         val addRecipe: Button = view.findViewById(R.id.add_recipe_btn)
 
         addRecipe.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, CreateRecipeFragment()) // Меняем текущий фрагмент
-                .addToBackStack(null) // Добавляем в backstack для возможности вернуться назад
-                .commit()
+            findNavController().navigate(R.id.action_recipeFragment_to_createRecipeFragment)
+
         }
     }
 }

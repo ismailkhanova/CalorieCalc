@@ -31,6 +31,12 @@ class SearchProductFragment : Fragment() {
     private lateinit var adapter: ProductAdapter
     private lateinit var cancelBtn: Button
     private val api = CaloriesNinjasApi.create()
+    private var isForRecipe: Boolean = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        isForRecipe = arguments?.getBoolean("isForRecipe") ?: false
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -87,12 +93,16 @@ class SearchProductFragment : Fragment() {
     private fun openProductFragment(product: Product) {
         val mealName = arguments?.getString("meal_name") ?: "Завтрак"
         val args = Bundle().apply {
-            putString("meal_name", mealName)
+            putBoolean("isForRecipe", isForRecipe)
             putString("product_name", product.name)
             putFloat("product_calories", roundToTwoDecimals(product.calories).toFloat())
             putFloat("protein", roundToTwoDecimals(product.protein_g).toFloat())
             putFloat("fat", roundToTwoDecimals(product.fat_total_g).toFloat())
             putFloat("carbs", roundToTwoDecimals(product.carbohydrates_total_g).toFloat())
+
+            if (!isForRecipe) {
+                putString("meal_name", mealName)
+            }
 
     }
 

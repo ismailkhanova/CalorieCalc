@@ -9,41 +9,59 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.caloriecalc.R
-import com.example.caloriecalc.data.Ingredient
+import com.example.caloriecalc.data.Product
+import com.example.caloriecalc.databinding.ItemIngredientBinding
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 
 class IngredientsAdapter(
-    private var ingredients: List<Ingredient>,
-    private val onRemoveClick: (Ingredient) -> Unit
-) : RecyclerView.Adapter<IngredientsAdapter.ViewHolder>() {
+    private val onDeleteClick: (Product) -> Unit,
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val nameTextView: TextView = itemView.findViewById(R.id.IngredientName)
-        private val weightTextView: TextView = itemView.findViewById(R.id.IngredientWeight)
-        private val removeButton: Button = itemView.findViewById(R.id.btnRemove)
+) : ListAdapter<Product, IngredientsAdapter.IngredientViewHolder>(DiffCallback()) {
 
-        fun bind(ingredient: Ingredient) {
-            nameTextView.text = ingredient.name
-            weightTextView.text = "${ingredient.weight.toInt()}г (${"%.1f".format(ingredient.caloriesPer100g)} ккал/100г)"
-            removeButton.setOnClickListener { onRemoveClick(ingredient) }
+    class IngredientViewHolder(private val binding: ItemIngredientBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+
+        private val decimalFormat = DecimalFormat("#.##").apply {
+            roundingMode = RoundingMode.DOWN
+        }
+        fun Double.roundToTwo(): Double {
+            return decimalFormat.format(this).replace(",", ".").toDouble()
+        }
+
+        fun bind(ingredient: Product, onDeleteClick: (Product) -> Unit) {
+            binding.apply {
+                IngredientName.text = ingredient.name
+                IngredientWeight.text = "${ingredient.weight.roundToTwo()} г"
+                IngredientCalories.text = "${ingredient.calories.roundToTwo()} ккал"
+
+                btnRemove.setOnClickListener {
+                    onDeleteClick(ingredient)
+                }
+            }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
-            LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_ingredient, parent, false)
+    private class DiffCallback : DiffUtil.ItemCallback<Product>() {
+        override fun areItemsTheSame(oldItem: Product, newItem: Product) =
+            oldItem.name == newItem.name && oldItem.weight == newItem.weight
+
+        override fun areContentsTheSame(oldItem: Product, newItem: Product) =
+            oldItem == newItem
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IngredientViewHolder {
+        val binding = ItemIngredientBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
+        return IngredientViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(ingredients[position])
-    }
-
-    override fun getItemCount(): Int = ingredients.size
-
-    fun updateData(newIngredients: List<Ingredient>) {
-        ingredients = newIngredients
-        notifyDataSetChanged()
+    override fun onBindViewHolder(holder: IngredientViewHolder, position: Int) {
+        holder.bind(getItem(position), onDeleteClick)
     }
 }

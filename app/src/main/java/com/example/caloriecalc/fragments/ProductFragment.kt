@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,24 +13,31 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import androidx.annotation.RequiresApi
-import androidx.core.os.bundleOf
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.caloriecalc.R
 import com.example.caloriecalc.data.DiaryViewModel
 import com.example.caloriecalc.data.Product
+import com.example.caloriecalc.data.RecipeViewModel
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.time.LocalDate
-import kotlin.math.round
 
 
 class ProductFragment : Fragment() {
     private lateinit var viewModel: DiaryViewModel
+    private val recipeViewModel: RecipeViewModel by activityViewModels()
+    private var isForRecipe: Boolean = false
 
     private val decimalFormat = DecimalFormat("#.##").apply {
         roundingMode = RoundingMode.DOWN
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        isForRecipe = arguments?.getBoolean("isForRecipe") ?: false
+        Log.d("ProductFragment", "isForRecipe = $isForRecipe") // Для отладки
     }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -99,12 +107,18 @@ class ProductFragment : Fragment() {
                 carbohydrates_total_g = (productCarbs * weight / 100).roundToTwo()
             )
 
-
-            val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
-            viewModel.addProduct(selectedDate, mealName, newProduct)
-
-            // Navigate back to SearchProductFragment using NavController
-            findNavController().navigateUp()
+            if (isForRecipe) {
+                // Получаем ViewModel из activity
+                val recipeViewModel: RecipeViewModel by activityViewModels()
+                recipeViewModel.addIngredient(newProduct)
+                // Возвращаемся сразу в CreateRecipeFragment
+                findNavController().navigateUp()
+            } else {
+                // Оригинальная логика для дневника
+                val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
+                viewModel.addProduct(selectedDate, mealName, newProduct)
+                findNavController().navigateUp()
+            }
         }
 
         return binding

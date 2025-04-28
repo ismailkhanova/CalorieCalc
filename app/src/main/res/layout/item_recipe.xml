@@ -26,7 +26,7 @@
 
             <!-- Название продукта -->
             <TextView
-                android:id="@+id/productName"
+                android:id="@+id/recipeName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -36,7 +36,7 @@
 
             <!-- Калории -->
             <TextView
-                android:id="@+id/productCalories"
+                android:id="@+id/recipeCalories"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="200 ккал"
@@ -46,7 +46,7 @@
 
         <!-- Граммовка -->
         <TextView
-            android:id="@+id/productWeight"
+            android:id="@+id/recipeWeight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="100 г"
