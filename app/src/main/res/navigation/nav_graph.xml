@@ -73,9 +73,10 @@
             app:popUpTo="@id/createRecipeFragment"
             app:popUpToInclusive="false"/>
         <argument
-            android:name="isForRecipe"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:name="recipe"
+            app:argType="com.example.caloriecalc.data.Recipe"
+            app:nullable="true"
+            android:defaultValue="@null"/>
 
     </fragment>
 

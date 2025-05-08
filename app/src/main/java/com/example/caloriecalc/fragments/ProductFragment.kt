@@ -13,7 +13,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.caloriecalc.R
@@ -112,6 +114,7 @@ class ProductFragment : Fragment() {
                 val recipeViewModel: RecipeViewModel by activityViewModels()
                 recipeViewModel.addIngredient(newProduct)
                 // Возвращаемся сразу в CreateRecipeFragment
+                setFragmentResult("ingredient_added", bundleOf("ingredient" to newProduct))
                 findNavController().navigateUp()
             } else {
                 // Оригинальная логика для дневника

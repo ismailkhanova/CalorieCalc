@@ -24,11 +24,12 @@ import com.example.caloriecalc.databinding.FragmentCreateRecipeBinding
 import com.google.android.material.textfield.TextInputEditText
 import kotlin.math.roundToInt
 
-
 class CreateRecipeFragment : Fragment() {
     private lateinit var binding: FragmentCreateRecipeBinding
     private val viewModel: RecipeViewModel by activityViewModels()
     private lateinit var adapter: IngredientsAdapter
+    private var isEditMode = false
+    private var currentRecipeId: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentCreateRecipeBinding.inflate(inflater, container, false)
@@ -38,13 +39,45 @@ class CreateRecipeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.resetSaveStatus()
-
-
+        parentFragmentManager.setFragmentResultListener("ingredient_added", viewLifecycleOwner) { _, bundle ->
+            val ingredient = bundle.getParcelable<Product>("ingredient")
+            ingredient?.let {
+                viewModel.addIngredient(it)
+            }
+        }
 
         setupRecyclerView()
+        checkEditMode()
         setupButtons()
         observeViewModel()
+    }
+
+    private fun checkEditMode() {
+        arguments?.let { bundle ->
+            val recipeArgs = CreateRecipeFragmentArgs.fromBundle(bundle).recipe
+            if (recipeArgs != null) {
+                // Если recipeArgs не null, то активируем режим редактирования
+                isEditMode = true
+                currentRecipeId = recipeArgs.id
+                populateFields(recipeArgs)
+            } else {
+                // Если recipeArgs == null, это означает, что мы создаём новый рецепт
+                isEditMode = false
+                currentRecipeId = null
+            }
+        }
+    }
+
+
+    private fun populateFields(recipe: Recipe) {
+        with(binding) {
+            etRecipeName.setText(recipe.name)
+            etContainerWeight.setText(recipe.containerWeight.toString())
+            etTotalWeight.setText(recipe.totalWeight.toString())
+            btnSaveRecipe.text = "Обновить рецепт"
+        }
+        viewModel.setIngredients(recipe.ingredients)
+
     }
 
     private fun setupRecyclerView() {
@@ -67,69 +100,111 @@ class CreateRecipeFragment : Fragment() {
         }
 
         binding.btnCalculate.setOnClickListener {
-            val containerWeight = binding.etContainerWeight.text.toString().toDoubleOrNull() ?: 0.0
-            val totalWeight = binding.etTotalWeight.text.toString().toDoubleOrNull() ?: 0.0
-
-            if (containerWeight >= totalWeight) {
-                Toast.makeText(requireContext(),
-                    "Вес посуды не может быть больше общего веса",
-                    Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            viewModel.calculateCalories(containerWeight, totalWeight)
+            calculateCalories()
         }
 
         binding.btnSaveRecipe.setOnClickListener {
-            val name = binding.etRecipeName.text.toString()
-            val containerWeight = binding.etContainerWeight.text.toString().toDoubleOrNull() ?: 0.0
-            val totalWeight = binding.etTotalWeight.text.toString().toDoubleOrNull() ?: 0.0
-
-            if (name.isBlank()) {
-                Toast.makeText(requireContext(), "Введите название рецепта", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            viewModel.saveRecipe(name, containerWeight, totalWeight)
-            viewModel.currentRecipe.value?.let { recipe ->
-                viewModel.saveRecipeToFirebase(recipe)
+            if (validateFields()) {
+                if (isEditMode) {
+                    updateRecipe()
+                } else {
+                    createRecipe()
+                }
             }
         }
     }
-    private fun Double.roundToTwo(): Double {
-        return (this * 100).roundToInt() / 100.0
+
+    private fun calculateCalories() {
+        val containerWeight = binding.etContainerWeight.text.toString().toDoubleOrNull() ?: 0.0
+        val totalWeight = binding.etTotalWeight.text.toString().toDoubleOrNull() ?: 0.0
+
+        if (containerWeight >= totalWeight) {
+            Toast.makeText(
+                requireContext(),
+                "Вес посуды не может быть больше общего веса",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
+
+        viewModel.calculateCalories(containerWeight, totalWeight)
+    }
+
+    private fun validateFields(): Boolean {
+        return when {
+            binding.etRecipeName.text?.isBlank() == true -> {
+                Toast.makeText(requireContext(), "Введите название рецепта", Toast.LENGTH_SHORT).show()
+                false
+            }
+
+            viewModel.ingredients.value.isNullOrEmpty() -> {
+                Toast.makeText(requireContext(), "Добавьте хотя бы один ингредиент", Toast.LENGTH_SHORT).show()
+                false
+            }
+            else -> true
+        }
+    }
+
+    private fun createRecipe() {
+        val name = binding.etRecipeName.text.toString()
+        val containerWeight = binding.etContainerWeight.text.toString().toDoubleOrNull() ?: 0.0
+        val totalWeight = binding.etTotalWeight.text.toString().toDoubleOrNull() ?: 0.0
+
+        viewModel.saveRecipe(name, containerWeight, totalWeight)
+        viewModel.currentRecipe.value?.let { recipe ->
+            viewModel.saveRecipeToFirebase(recipe)
+        }
+    }
+
+    private fun updateRecipe() {
+        val name = binding.etRecipeName.text.toString()
+        val containerWeight = binding.etContainerWeight.text.toString().toDoubleOrNull() ?: 0.0
+        val totalWeight = binding.etTotalWeight.text.toString().toDoubleOrNull() ?: 0.0
+
+        viewModel.saveRecipe(name, containerWeight, totalWeight)
+        viewModel.currentRecipe.value?.let { recipe ->
+            val updatedRecipe = recipe.copy(
+                id = currentRecipeId ?: return@let,
+                name = name,
+                ingredients = viewModel.ingredients.value ?: emptyList()
+            )
+            viewModel.updateRecipeInFirebase(updatedRecipe)
+        }
     }
 
     private fun observeViewModel() {
         viewModel.ingredients.observe(viewLifecycleOwner) { ingredients ->
-            Log.d("CreateRecipe", "Ingredients updated: ${ingredients.size} items")
             adapter.submitList(ingredients.toList())
         }
 
-
         viewModel.currentRecipe.observe(viewLifecycleOwner) { recipe ->
-            binding.tvCaloriesPer100g.text =
-                "Калорийность на 100 г: ${recipe.caloriesPer100g.roundToTwo()} ккал"
-        }
-
-        viewModel.saveStatus.observe(viewLifecycleOwner) { status ->
-            status?.let { safeStatus -> // добавляем проверку на null
-                when (safeStatus) {
-                    is Resource.Success -> {
-                        Toast.makeText(requireContext(), "Рецепт сохранён", Toast.LENGTH_SHORT).show()
-                        viewModel.clearRecipeData()
-                        viewModel.resetSaveStatus() // Сбрасываем статус
-                        findNavController().navigateUp()
-                    }
-                    is Resource.Error -> {
-                        Toast.makeText(requireContext(), safeStatus.message, Toast.LENGTH_SHORT).show()
-                    }
-                    is Resource.Loading -> {
-                        // Можно показать ProgressBar
-                    }
-                }
+            recipe?.let {
+                binding.tvCaloriesPer100g.text = "Калорийность на 100 г: ${recipe.caloriesPer100g.roundToTwo()} ккал"
+                binding.protein.text = "Белки: ${recipe.protein.roundToTwo()} г"
+                binding.fat.text = "Жиры: ${recipe.fat.roundToTwo()} г"
+                binding.carbs.text = "Углеводы: ${recipe.carbs.roundToTwo()} г"
             }
         }
 
+        viewModel.saveStatus.observe(viewLifecycleOwner) { status ->
+            when (status) {
+                is Resource.Success -> {
+                    Toast.makeText(requireContext(),
+                        if (isEditMode) "Рецепт обновлён" else "Рецепт сохранён",
+                        Toast.LENGTH_SHORT).show()
+                    viewModel.clearRecipeData()
+                    findNavController().navigateUp()
+                }
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), status.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> {
+                    // Показать индикатор загрузки
+                }
+                else -> {}
+            }
+        }
     }
+
+    private fun Double.roundToTwo(): Double = (this * 100).roundToInt() / 100.0
 }

@@ -85,6 +85,27 @@
             android:textStyle="bold"
             android:textSize="16sp"
             android:layout_marginTop="16dp" />
+        <TextView
+            android:id="@+id/protein"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Белки"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp" />
+        <TextView
+            android:id="@+id/fat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Жиры"
+            android:textSize="16sp"
+            android:layout_marginTop="5dp" />
+        <TextView
+            android:id="@+id/carbs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Углеводы"
+            android:textSize="16sp"
+            android:layout_marginTop="5dp" />
 
         <Button
             android:id="@+id/btnCalculate"
