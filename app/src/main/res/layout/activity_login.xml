@@ -7,29 +7,27 @@
     android:layout_height="match_parent"
     tools:context=".registration_user.LoginActivity">
 
-    <!-- Карточка с формой -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_margin="16dp"
-        android:padding="16dp"
-        app:cardElevation="0dp"
-        app:cardCornerRadius="12dp"
-        android:backgroundTint="@android:color/white">
+<!--    &lt;!&ndash; Карточка с формой &ndash;&gt;-->
+<!--    <com.google.android.material.card.MaterialCardView-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        android:layout_margin="16dp"-->
+<!--        android:padding="16dp"-->
+<!--        app:cardElevation="2dp"-->
+<!--        app:cardCornerRadius="10dp"-->
+<!--        android:backgroundTint="@android:color/white">-->
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:gravity="center_horizontal">
+                android:gravity="center">
 
                 <!-- Заголовок -->
                 <TextView
@@ -39,7 +37,8 @@
                     android:textSize="24sp"
                     android:fontFamily="sans-serif-medium"
                     android:textColor="@color/black"
-                    android:layout_marginBottom="32dp" />
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginTop="20dp"/>
 
                 <!-- Поле Имя пользователя -->
                 <com.google.android.material.textfield.TextInputLayout
@@ -53,6 +52,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="Введите email-адрес"
+                        android:layout_margin="5dp"
                         android:inputType="textEmailAddress"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -60,6 +60,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
                     app:boxBackgroundColor="@color/white"
                     app:boxStrokeColor="@color/teal_700"
                     android:layout_marginTop="16dp">
@@ -78,6 +79,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Войти"
+                    android:layout_margin="5dp"
                     android:backgroundTint="#104AA8"
                     android:textColor="@android:color/white"
                     android:layout_marginTop="32dp"
@@ -104,8 +106,8 @@
                     android:fontFamily="sans-serif"
                     android:textSize="14sp" />
             </LinearLayout>
-        </ScrollView>
-    </com.google.android.material.card.MaterialCardView>
+
+<!--    </com.google.android.material.card.MaterialCardView>-->
 
     <FrameLayout
         android:id="@+id/loading_layout"

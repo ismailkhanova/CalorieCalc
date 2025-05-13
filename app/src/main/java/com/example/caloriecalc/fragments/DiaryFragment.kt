@@ -195,7 +195,7 @@ class DiaryFragment : Fragment() {
         recyclerViewMeals.isNestedScrollingEnabled = true
     }
 
-    // 🔥 Метод для добавления продукта в нужный Meal
+    // Метод для добавления продукта в нужный Meal
     private fun addProductToMeal(mealName: String, newProduct: Product) {
         val meal = meals.find { it.name == mealName }
         meal?.let {
