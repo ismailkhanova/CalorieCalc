@@ -5,6 +5,10 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/profileFragment">
 
+    <action
+        android:id="@+id/action_global_productFragment"
+        app:destination="@id/productFragment" />
+
     <!-- Фрагмент для Профиля -->
     <fragment
         android:id="@+id/profileFragment"
@@ -23,6 +27,12 @@
             app:destination="@id/searchProductFragment"
             app:popUpTo="@id/diaryFragment"
             app:popUpToInclusive="false"/>
+        <action
+            android:id="@+id/action_diaryFragment_to_addToMealViewPagerFragment"
+            app:destination="@id/addToMealViewPagerFragment"
+            app:popUpTo="@id/diaryFragment"
+            app:popUpToInclusive="false"/>
+
         <argument android:name="meal_name" app:argType="string" />
     </fragment>
 
@@ -94,5 +104,15 @@
             app:argType="boolean"
             android:defaultValue="false" />
     </fragment>
+
+    <fragment
+        android:id="@+id/addToMealViewPagerFragment"
+        android:name="com.example.caloriecalc.fragments.AddToMealViewPagerFragment"
+        android:label="Добавление в приём пищи" >
+        <argument
+            android:name="meal_name"
+            app:argType="string" />
+    </fragment>
+
 
 </navigation>

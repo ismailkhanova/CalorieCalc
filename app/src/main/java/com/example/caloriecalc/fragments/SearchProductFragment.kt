@@ -108,7 +108,7 @@ class SearchProductFragment : Fragment() {
 
         // Navigate to ProductFragment with NavController
         findNavController().navigate(
-            R.id.action_searchProductFragment_to_productFragment,
+            R.id.action_global_productFragment,
             args
         )
     }

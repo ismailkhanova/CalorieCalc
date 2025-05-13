@@ -185,7 +185,7 @@ class DiaryFragment : Fragment() {
 
             // Используем NavController для перехода с аргументами
             findNavController().navigate(
-                R.id.action_diaryFragment_to_searchProductFragment,
+                R.id.action_diaryFragment_to_addToMealViewPagerFragment,
                 bundle
             )
         }
