@@ -15,6 +15,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import java.time.DayOfWeek
 import java.time.LocalDate
+import kotlin.math.roundToInt
 
 class DiaryViewModel: ViewModel() {
     private val database = Firebase.database.reference
@@ -29,9 +30,13 @@ class DiaryViewModel: ViewModel() {
 
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> = _isLoading
+    private val _goalCalories = MutableLiveData<Int>()
+    val goalCalories: LiveData<Int> = _goalCalories
+
     init {
         database.keepSynced(true)
         loadInitialWeekData()
+        loadUserGoalCalories()
     }
 
     fun loadInitialWeekData() {
@@ -141,6 +146,39 @@ class DiaryViewModel: ViewModel() {
 
     fun getFoodForDate(date: LocalDate): Map<String, List<Product>>{
         return _foodData.value?.get(date) ?: emptyMap()
+    }
+
+    fun loadUserGoalCalories() {
+        database.child("profiles").child(currentUserId).child("goalCalories")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val goal = snapshot.getValue(Int::class.java)
+                    _goalCalories.value = goal ?: 2000
+                }
+                override fun onCancelled(error: DatabaseError){
+                    Log.e("DiaryViewModel", "Failed to load goalCalories", error.toException())
+                }
+            })
+    }
+
+    fun getNutrientSummaryForDate(date: LocalDate): NutrientSummary {
+        val meals = getFoodForDate(date)
+        var totalCalories = 0.0
+        var totalProtein = 0.0
+        var totalFats = 0.0
+        var totalCarbs = 0.0
+
+        for((_, products) in meals){
+            for(product in products){
+                totalCalories += product.calories.roundToInt()
+                totalProtein += product.protein_g
+                totalFats += product.fat_total_g
+                totalCarbs += product.carbohydrates_total_g
+            }
+        }
+
+        return NutrientSummary(totalCalories, totalProtein, totalFats, totalCarbs)
+
     }
 
 }

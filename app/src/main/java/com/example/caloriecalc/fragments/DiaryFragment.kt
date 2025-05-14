@@ -27,6 +27,7 @@ import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlin.math.roundToInt
 
 class DiaryFragment : Fragment() {
     private lateinit var viewModel: DiaryViewModel
@@ -59,6 +60,12 @@ class DiaryFragment : Fragment() {
         recyclerViewMeals = view.findViewById(R.id.recyclerViewMeals)
         progressBar = view.findViewById(R.id.progressBar)
 
+        totalCaloriesTextView = view.findViewById(R.id.text_total_calories)
+        totalProteinTextView = view.findViewById(R.id.text_total_protein)
+        totalFatsTextView = view.findViewById(R.id.text_total_fats)
+        totalCarbsTextView = view.findViewById(R.id.text_total_carbs)
+
+
 
         view.findViewById<ImageView>(R.id.btn_calendar).setOnClickListener {
             showDatePicker()
@@ -88,6 +95,19 @@ class DiaryFragment : Fragment() {
             val meals = viewModel.getMealsForDate(date)
             updateMealsForDate(date, meals)
         }
+
+        viewModel.goalCalories.observe(viewLifecycleOwner) { goalCalories ->
+            val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
+            updateNutrientUI(goalCalories, selectedDate)
+        }
+
+        viewModel.foodData.observe(viewLifecycleOwner) {
+            val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
+            viewModel.goalCalories.value?.let { goalCalories ->
+                updateNutrientUI(goalCalories, selectedDate)
+            }
+        }
+
 
         viewModel.loadInitialWeekData()
 
@@ -224,6 +244,33 @@ class DiaryFragment : Fragment() {
             CalendarDay(date, isToday)
         }
         daysAdapter.submitList(updatedDays)
+    }
+
+    private fun updateNutrientUI(goalCalories: Int, date: LocalDate) {
+        val summary = viewModel.getNutrientSummaryForDate(date)
+
+        totalCaloriesTextView.text = "${summary.calories} ккал"
+        totalProteinTextView.text = "Б: ${"%.1f".format(summary.protein)} г"
+        totalFatsTextView.text = "Ж: ${"%.1f".format(summary.fats)} г"
+        totalCarbsTextView.text = "У: ${"%.1f".format(summary.carbs)} г"
+
+        val percentOfGoal = if (goalCalories > 0){
+            ((summary.calories * 100) / goalCalories).roundToInt()
+        }else 0
+        view?.findViewById<TextView>(R.id.caloriesInPercent)?.text = "РСК: $percentOfGoal%"
+
+        val proteinCalories = summary.protein * 4
+        val fatsCalories = summary.fats * 9
+        val carbsCalories = summary.carbs * 4
+        val total = proteinCalories + fatsCalories + carbsCalories
+
+        val proteinPercent = if (total > 0) ((proteinCalories * 100.0) / total).roundToInt() else 0
+        val fatsPercent = if (total > 0)  ((fatsCalories * 100.0) / total).roundToInt() else 0
+        val carbsPercent = if (total > 0) 100 - (proteinPercent + fatsPercent) else 0
+
+        view?.findViewById<TextView>(R.id.proteinInPercent)?.text = "$proteinPercent%"
+        view?.findViewById<TextView>(R.id.fatsInPercent)?.text = "$fatsPercent%"
+        view?.findViewById<TextView>(R.id.carbsInPercent)?.text = "$carbsPercent%"
     }
 
     override fun onResume() {
