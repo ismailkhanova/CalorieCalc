@@ -22,6 +22,15 @@ class RecipeFragment : Fragment() {
     private val viewModel: RecipeViewModel by activityViewModels()
     private lateinit var adapter: RecipeAdapter
 
+    private val isFromViewPager by lazy {
+        arguments?.getString("source") == "from_meal"
+    }
+    private val mealName by lazy {
+        arguments?.getString("meal_name") ?: "Завтрак"
+    }
+
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,14 +53,34 @@ class RecipeFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter =  RecipeAdapter{ recipe ->
-            openRecipeDetails(recipe)
+        adapter = RecipeAdapter { recipe ->
+            if(isFromViewPager){
+                openRecipeAsProduct(recipe)
+            }else {
+                openRecipeDetails(recipe)
+            }
         }
         binding.recyclerViewMeals.adapter = adapter
         binding.recyclerViewMeals.layoutManager = LinearLayoutManager(requireContext())
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         viewModel.loadRecipes(userId)
 
+    }
+
+    private fun openRecipeAsProduct(recipe: Recipe){
+        val args = Bundle().apply {
+            putBoolean("is_recipe", true)
+            putString("meal_name", mealName)
+            putString("product_name", recipe.name)
+            putFloat("product_calories", recipe.caloriesPer100g.toFloat())
+            putFloat("protein", recipe.protein.toFloat())
+            putFloat("fat", recipe.fat.toFloat())
+            putFloat("carbs", recipe.carbs.toFloat())
+        }
+        findNavController().navigate(
+            R.id.action_global_productFragment,
+            args
+        )
     }
 
     private fun observeViewModel(){

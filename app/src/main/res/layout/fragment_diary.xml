@@ -31,8 +31,6 @@
         android:layout_marginTop="20dp"/>
 
 
-    <!-- RecyclerView для карточек еды -->
-
     <ImageView
         android:id="@+id/btn_calendar"
         android:layout_width="40dp"
@@ -46,6 +44,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <LinearLayout
+        android:id="@+id/nutrition_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:weightSum="4"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewDays">
+
+        <TextView
+            android:id="@+id/text_total_protein"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Белки: 0 г" />
+
+        <TextView
+            android:id="@+id/text_total_fats"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Жиры: 0 г" />
+
+        <TextView
+            android:id="@+id/text_total_carbs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Углеводы: 0 г" />
+
+        <TextView
+            android:id="@+id/text_total_calories"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Калории: 0 ккал" />
+
+    </LinearLayout>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewMeals"
         android:layout_width="match_parent"
@@ -54,7 +98,7 @@
         android:clipToPadding="false"
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@id/recyclerViewDays"
+        app:layout_constraintTop_toBottomOf="@id/nutrition_summary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

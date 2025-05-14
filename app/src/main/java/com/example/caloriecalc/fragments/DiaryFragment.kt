@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -34,6 +35,11 @@ class DiaryFragment : Fragment() {
     private lateinit var recyclerViewMeals: RecyclerView
     private lateinit var mealAdapter: MealAdapter
     private lateinit var progressBar: ProgressBar
+    private lateinit var totalCaloriesTextView: TextView
+    private lateinit var totalProteinTextView: TextView
+    private lateinit var totalFatsTextView: TextView
+    private lateinit var totalCarbsTextView: TextView
+
     private val cachedWeek = mutableMapOf<LocalDate, Map<String, List<Product>>>()
     private val meals = mutableListOf( // Добавляем meals в поле класса, чтобы к нему можно было обращаться
         Meal("Завтрак"),
@@ -52,6 +58,7 @@ class DiaryFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerViewDays)
         recyclerViewMeals = view.findViewById(R.id.recyclerViewMeals)
         progressBar = view.findViewById(R.id.progressBar)
+
 
         view.findViewById<ImageView>(R.id.btn_calendar).setOnClickListener {
             showDatePicker()
@@ -193,22 +200,6 @@ class DiaryFragment : Fragment() {
         recyclerViewMeals.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewMeals.adapter = mealAdapter
         recyclerViewMeals.isNestedScrollingEnabled = true
-    }
-
-    // Метод для добавления продукта в нужный Meal
-    private fun addProductToMeal(mealName: String, newProduct: Product) {
-        val meal = meals.find { it.name == mealName }
-        meal?.let {
-            it.products.add(newProduct) // Добавляем продукт в приём пищи
-
-            // 🔥 Обновляем суммарные значения калорий и БЖУ
-            it.getTotalCalories()
-            it.getTotalProtein()
-            it.getTotalFat()
-            it.getTotalCarbs()
-
-            mealAdapter.notifyDataSetChanged() // 🔄 Обновляем RecyclerView
-        }
     }
 
     // Метод для загрузки текущей недели

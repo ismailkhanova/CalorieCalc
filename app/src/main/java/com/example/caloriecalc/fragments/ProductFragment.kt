@@ -31,6 +31,7 @@ class ProductFragment : Fragment() {
     private lateinit var viewModel: DiaryViewModel
     private val recipeViewModel: RecipeViewModel by activityViewModels()
     private var isForRecipe: Boolean = false
+    private var isRecipe: Boolean = false
 
     private val decimalFormat = DecimalFormat("#.##").apply {
         roundingMode = RoundingMode.DOWN
@@ -41,6 +42,7 @@ class ProductFragment : Fragment() {
         isForRecipe = arguments?.getBoolean("isForRecipe") ?: false
         Log.d("ProductFragment", "isForRecipe = $isForRecipe") // Для отладки
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -77,7 +79,8 @@ class ProductFragment : Fragment() {
 
         fun updateNutrition(weight: Double) {
             val factor = weight / 100
-            caloriesTextView.text = "Калории: ${decimalFormat.format(productCalories * factor)} ккал"
+            caloriesTextView.text =
+                "Калории: ${decimalFormat.format(productCalories * factor)} ккал"
             proteinTextView.text = "Белки: ${decimalFormat.format(productProtein * factor)} г"
             fatTextView.text = "Жиры: ${decimalFormat.format(productFat * factor)} г"
             carbsTextView.text = "Углеводы: ${decimalFormat.format(productCarbs * factor)} г"
@@ -109,18 +112,30 @@ class ProductFragment : Fragment() {
                 carbohydrates_total_g = (productCarbs * weight / 100).roundToTwo()
             )
 
-            if (isForRecipe) {
-                // Получаем ViewModel из activity
-                val recipeViewModel: RecipeViewModel by activityViewModels()
-                recipeViewModel.addIngredient(newProduct)
-                // Возвращаемся сразу в CreateRecipeFragment
-                setFragmentResult("ingredient_added", bundleOf("ingredient" to newProduct))
-                findNavController().navigateUp()
-            } else {
-                // Оригинальная логика для дневника
-                val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
-                viewModel.addProduct(selectedDate, mealName, newProduct)
-                findNavController().navigateUp()
+            when {
+                isForRecipe -> {
+                    // Случай 2: Добавление продукта в ингредиенты рецепта
+                    val recipeViewModel: RecipeViewModel by activityViewModels()
+                    recipeViewModel.addIngredient(newProduct)
+                    setFragmentResult("ingredient_added", bundleOf("ingredient" to newProduct))
+                    findNavController().navigateUp()
+                }
+
+                isRecipe -> {
+                    // Случай 3: Добавление рецепта в дневник как продукта
+                    val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
+                    viewModel.addProduct(selectedDate, mealName, newProduct.apply {
+                        isRecipe = true
+                    })
+                    findNavController().navigateUp()
+                }
+
+                else -> {
+                    // Случай 1: Обычное добавление продукта в дневник
+                    val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
+                    viewModel.addProduct(selectedDate, mealName, newProduct)
+                    findNavController().navigateUp()
+                }
             }
         }
 

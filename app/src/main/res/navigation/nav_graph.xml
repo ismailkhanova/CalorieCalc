@@ -59,10 +59,8 @@
         android:name="com.example.caloriecalc.fragments.ProductFragment"
         android:label="ProductFragment">
 
-        <argument
-            android:name="isForRecipe"
-            app:argType="boolean"
-            android:defaultValue="false" />
+        <argument android:name="isForRecipe" app:argType="boolean" android:defaultValue="false" />
+        <argument android:name="is_recipe" app:argType="boolean" android:defaultValue="false"/>
 
         <argument android:name="meal_name" app:argType="string" />
         <argument android:name="product_name" app:argType="string" />

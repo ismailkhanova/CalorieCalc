@@ -12,7 +12,8 @@ import com.example.caloriecalc.databinding.ItemRecipeBinding
 
 
 class RecipeAdapter(
-    private val onRecipeClick: (Recipe) -> Unit
+    private val onRecipeClick: (Recipe) -> Unit,
+
 ): ListAdapter<Recipe, RecipeAdapter.RecipeViewHolder>(DiffCallBack()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
@@ -36,7 +37,7 @@ class RecipeAdapter(
             productCarbs.text = "У: ${recipe.carbs.roundToTwo()}г"
 
             root.setOnClickListener {
-                onRecipeClick(recipe)
+               onRecipeClick(recipe)
             }
         }
 
