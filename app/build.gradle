@@ -76,5 +76,6 @@ dependencies {
 // Navigation UI (для работы с NavigationView, BottomNavigationView и т.п.)
     implementation "androidx.navigation:navigation-ui-ktx:2.9.0"
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 
 }

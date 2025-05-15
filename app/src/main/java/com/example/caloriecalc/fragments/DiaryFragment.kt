@@ -1,5 +1,7 @@
 package com.example.caloriecalc.fragments
 
+import android.graphics.Color
+import android.graphics.Insets.add
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -11,6 +13,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +25,12 @@ import com.example.caloriecalc.data.CalendarDay
 import com.example.caloriecalc.data.DiaryViewModel
 import com.example.caloriecalc.data.Meal
 import com.example.caloriecalc.data.Product
+import com.github.mikephil.charting.charts.PieChart
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.time.DayOfWeek
 import java.time.Instant
@@ -268,9 +277,57 @@ class DiaryFragment : Fragment() {
         val fatsPercent = if (total > 0)  ((fatsCalories * 100.0) / total).roundToInt() else 0
         val carbsPercent = if (total > 0) 100 - (proteinPercent + fatsPercent) else 0
 
-        view?.findViewById<TextView>(R.id.proteinInPercent)?.text = "$proteinPercent%"
-        view?.findViewById<TextView>(R.id.fatsInPercent)?.text = "$fatsPercent%"
-        view?.findViewById<TextView>(R.id.carbsInPercent)?.text = "$carbsPercent%"
+        setupPieChart(proteinPercent.toFloat(), fatsPercent.toFloat(), carbsPercent.toFloat())
+
+        val leftKcal = goalCalories - summary.calories
+        view?.findViewById<TextView>(R.id.usedKcal)?.text = "Употреблено: ${summary.calories}"
+        view?.findViewById<TextView>(R.id.leftKcal)?.text = "Осталось: $leftKcal"
+    }
+
+
+    private fun setupPieChart(protein: Float, fats: Float, carbs: Float) {
+        val pieChart = view?.findViewById<PieChart>(R.id.pieChart)
+
+        // 1. Подготовка данных
+        val entries = ArrayList<PieEntry>().apply {
+            add(PieEntry(protein, "Белки"))
+            add(PieEntry(fats, "Жиры"))
+            add(PieEntry(carbs, "Углеводы"))
+        }
+
+        // 2. Настройка внешнего вида
+        val dataSet = PieDataSet(entries, "").apply {
+            colors = listOf(
+                ContextCompat.getColor(requireContext(), R.color.protein_color), // Синий
+                ContextCompat.getColor(requireContext(), R.color.fats_color),   // Красный
+                ContextCompat.getColor(requireContext(), R.color.carbs_color)  // Зеленый
+            )
+            valueTextColor = Color.WHITE
+            valueTextSize = 12f
+        }
+
+        // 3. Форматирование значений
+        val pieData = PieData(dataSet).apply {
+            setValueFormatter(object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return "${value.toInt()}%"
+                }
+            })
+        }
+
+        // 4. Настройка диаграммы
+        pieChart?.apply {
+            data = pieData
+            description.isEnabled = false // Скрыть описание
+            isDrawHoleEnabled = false     // Кольцо в центре
+            setDrawEntryLabels(false) // ← Это отключит все надписи на секторах
+            setHoleColor(Color.TRANSPARENT)
+            setEntryLabelColor(Color.BLACK)
+            animateY(1000)
+
+            legend.isEnabled = false
+            invalidate()                 // Обновить
+        }
     }
 
     override fun onResume() {

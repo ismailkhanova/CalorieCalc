@@ -16,4 +16,8 @@
     <color name="light_gray">#D1CECE</color>
     <color name="whiteblue">#C3DBFF</color>
     <color name="grey">#818181</color>
+
+    <color name="protein_color">#4285F4</color> <!-- Синий -->
+    <color name="fats_color">#EA4335</color>    <!-- Красный -->
+    <color name="carbs_color">#34A853</color>   <!-- Зеленый -->
 </resources>
