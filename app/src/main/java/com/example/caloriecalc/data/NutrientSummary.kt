@@ -6,3 +6,16 @@ data class NutrientSummary(
     val fats: Double,
     val carbs: Double
 )
+
+data class NutrientUIModel(
+    val caloriesText: String,
+    val proteinText: String,
+    val fatsText: String,
+    val carbsText: String,
+    val caloriesInPercentText: String,
+    val pieChartData: Triple<Float, Float, Float>,
+    val kcalChartData: Pair<Float, Float>,
+    val usedKcalText: String,
+    val leftKcalText: String
+)
+

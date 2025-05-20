@@ -37,7 +37,7 @@ class ProductListAdapter(
 
         fun bind(product: Product) {
             productNameTextView.text = product.name
-            productCaloriesTextView.text = "${String.format("%.2f", product.calories)} ккал"
+            productCaloriesTextView.text = "${String.format("%.2f", product.calories)}"
             productWeightTextView.text = "${String.format("%.2f", product.weight)} г"
             productProteinTextView.text = "Б: ${product.protein_g} г"
             productFatTextView.text = "Ж: ${product.fat_total_g} г"

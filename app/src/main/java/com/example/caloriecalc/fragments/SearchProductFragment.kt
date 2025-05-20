@@ -95,10 +95,10 @@ class SearchProductFragment : Fragment() {
         val args = Bundle().apply {
             putBoolean("isForRecipe", isForRecipe)
             putString("product_name", product.name)
-            putFloat("product_calories", roundToTwoDecimals(product.calories).toFloat())
-            putFloat("protein", roundToTwoDecimals(product.protein_g).toFloat())
-            putFloat("fat", roundToTwoDecimals(product.fat_total_g).toFloat())
-            putFloat("carbs", roundToTwoDecimals(product.carbohydrates_total_g).toFloat())
+            putFloat("product_calories", roundToTwo(product.calories).toFloat())
+            putFloat("protein", roundToTwo(product.protein_g).toFloat())
+            putFloat("fat", roundToTwo(product.fat_total_g).toFloat())
+            putFloat("carbs", roundToTwo(product.carbohydrates_total_g).toFloat())
 
             if (!isForRecipe) {
                 putString("meal_name", mealName)
@@ -113,7 +113,7 @@ class SearchProductFragment : Fragment() {
         )
     }
 
-    private fun roundToTwoDecimals(value: Double): Double {
+    private fun roundToTwo(value: Double): Double {
         return (value * 100).roundToInt() / 100.0
     }
 

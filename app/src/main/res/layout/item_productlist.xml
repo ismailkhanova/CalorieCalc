@@ -39,7 +39,8 @@
                 android:id="@+id/productCalories"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="200 ккал"
+                android:layout_marginRight="40dp"
+                android:text="200"
                 android:textSize="16sp"
                 android:textColor="@android:color/black" />
         </LinearLayout>

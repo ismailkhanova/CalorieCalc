@@ -17,7 +17,10 @@
     <color name="whiteblue">#C3DBFF</color>
     <color name="grey">#818181</color>
 
-    <color name="protein_color">#4285F4</color> <!-- Синий -->
-    <color name="fats_color">#EA4335</color>    <!-- Красный -->
-    <color name="carbs_color">#34A853</color>   <!-- Зеленый -->
+    <color name="protein_color">#2AF5EB</color> <!-- Синий -->
+    <color name="fats_color">#2A7BF5</color>    <!-- Красный -->
+    <color name="carbs_color">#E4F52A</color>   <!-- Зеленый -->
+    <color name="kcal_used_color">#6670FF</color>   <!-- Синий -->
+    <color name="kcal_left_color">#A4DAED</color>   <!-- Светло-серый -->
+
 </resources>

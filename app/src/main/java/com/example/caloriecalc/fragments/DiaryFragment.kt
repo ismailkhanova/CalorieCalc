@@ -92,10 +92,18 @@ class DiaryFragment : Fragment() {
         }
 
         viewModel.foodData.observe(viewLifecycleOwner) { foodData ->
-            val currentDate = viewModel.selectedDate.value ?: LocalDate.now()
-            val mealsData = viewModel.getFoodForDate(currentDate)
-            updateMealsForDate(currentDate, mealsData)
+            val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
+
+            // Обновляем отображение приёмов пищи
+            val mealsData = viewModel.getFoodForDate(selectedDate)
+            updateMealsForDate(selectedDate, mealsData)
+
+            // Обновляем информацию о нутриентах, если известна цель по калориям
+            viewModel.goalCalories.value?.let { goalCalories ->
+                updateNutrientUI(goalCalories, selectedDate)
+            }
         }
+
 
         viewModel.selectedDate.observe(viewLifecycleOwner) { date ->
             daysAdapter.currentSelectedDate = date
@@ -110,15 +118,11 @@ class DiaryFragment : Fragment() {
             updateNutrientUI(goalCalories, selectedDate)
         }
 
-        viewModel.foodData.observe(viewLifecycleOwner) {
-            val selectedDate = viewModel.selectedDate.value ?: LocalDate.now()
-            viewModel.goalCalories.value?.let { goalCalories ->
-                updateNutrientUI(goalCalories, selectedDate)
-            }
+
+
+        view?.post {
+            viewModel.loadInitialWeekData()
         }
-
-
-        viewModel.loadInitialWeekData()
 
         val openSearchButton: ImageView = view.findViewById(R.id.search_button)
         openSearchButton.setOnClickListener {
@@ -256,32 +260,27 @@ class DiaryFragment : Fragment() {
     }
 
     private fun updateNutrientUI(goalCalories: Int, date: LocalDate) {
-        val summary = viewModel.getNutrientSummaryForDate(date)
+        val uiModel = viewModel.getNutrientUIModel(date, goalCalories)
 
-        totalCaloriesTextView.text = "${summary.calories} ккал"
-        totalProteinTextView.text = "Б: ${"%.1f".format(summary.protein)} г"
-        totalFatsTextView.text = "Ж: ${"%.1f".format(summary.fats)} г"
-        totalCarbsTextView.text = "У: ${"%.1f".format(summary.carbs)} г"
+        totalCaloriesTextView.text = uiModel.caloriesText
+        totalProteinTextView.text = uiModel.proteinText
+        totalFatsTextView.text = uiModel.fatsText
+        totalCarbsTextView.text = uiModel.carbsText
+        view?.findViewById<TextView>(R.id.caloriesInPercent)?.text = uiModel.caloriesInPercentText
 
-        val percentOfGoal = if (goalCalories > 0){
-            ((summary.calories * 100) / goalCalories).roundToInt()
-        }else 0
-        view?.findViewById<TextView>(R.id.caloriesInPercent)?.text = "РСК: $percentOfGoal%"
+        setupPieChart(
+            uiModel.pieChartData.first,
+            uiModel.pieChartData.second,
+            uiModel.pieChartData.third
+        )
 
-        val proteinCalories = summary.protein * 4
-        val fatsCalories = summary.fats * 9
-        val carbsCalories = summary.carbs * 4
-        val total = proteinCalories + fatsCalories + carbsCalories
+        setupCaloriePieChart(
+            uiModel.kcalChartData.first,
+            uiModel.kcalChartData.second
+        )
 
-        val proteinPercent = if (total > 0) ((proteinCalories * 100.0) / total).roundToInt() else 0
-        val fatsPercent = if (total > 0)  ((fatsCalories * 100.0) / total).roundToInt() else 0
-        val carbsPercent = if (total > 0) 100 - (proteinPercent + fatsPercent) else 0
-
-        setupPieChart(proteinPercent.toFloat(), fatsPercent.toFloat(), carbsPercent.toFloat())
-
-        val leftKcal = goalCalories - summary.calories
-        view?.findViewById<TextView>(R.id.usedKcal)?.text = "Употреблено: ${summary.calories}"
-        view?.findViewById<TextView>(R.id.leftKcal)?.text = "Осталось: $leftKcal"
+        view?.findViewById<TextView>(R.id.usedKcal)?.text = uiModel.usedKcalText
+        view?.findViewById<TextView>(R.id.leftKcal)?.text = uiModel.leftKcalText
     }
 
 
@@ -329,6 +328,53 @@ class DiaryFragment : Fragment() {
             invalidate()                 // Обновить
         }
     }
+
+    private fun setupCaloriePieChart(consumed: Float, remaining: Float) {
+        val pieChart = view?.findViewById<PieChart>(R.id.caloriePieChart)
+
+        // 1. Подготовка данных
+        val entries = ArrayList<PieEntry>().apply {
+            add(PieEntry(consumed, "Употреблено"))
+            add(PieEntry(remaining, "Осталось"))
+        }
+
+        // 2. Настройка внешнего вида
+        val dataSet = PieDataSet(entries, "").apply {
+            colors = listOf(
+                ContextCompat.getColor(requireContext(), R.color.kcal_used_color),    // Например, синий
+                ContextCompat.getColor(requireContext(), R.color.kcal_left_color)     // Например, серый или светлый
+            )
+            valueTextColor = Color.BLACK
+            valueTextSize = 12f
+            sliceSpace = 2f // Расстояние между секторами
+            setDrawValues(false)
+
+        }
+
+        val pieData = PieData(dataSet).apply {
+            setValueFormatter(object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return "${value.toInt()} ккал"
+                }
+            })
+        }
+
+        // 3. Настройка диаграммы
+        pieChart?.apply {
+            data = pieData
+            description.isEnabled = false
+            isDrawHoleEnabled = true
+            holeRadius = 10f
+            setHoleColor(Color.WHITE)
+            setDrawEntryLabels(false)
+            legend.isEnabled = false
+            setUsePercentValues(false)
+            animateY(1000)
+            setTransparentCircleAlpha(0)  // Важно! Убирает полупрозрачное кольцо
+            invalidate()
+        }
+    }
+
 
     override fun onResume() {
         super.onResume()
