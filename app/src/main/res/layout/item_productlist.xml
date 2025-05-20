@@ -43,6 +43,19 @@
                 android:text="200"
                 android:textSize="16sp"
                 android:textColor="@android:color/black" />
+
+            <ImageButton
+                android:id="@+id/remove_btn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="Добавить продукт"
+                android:src="@drawable/remove_btn"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
         </LinearLayout>
 
         <!-- Граммовка -->

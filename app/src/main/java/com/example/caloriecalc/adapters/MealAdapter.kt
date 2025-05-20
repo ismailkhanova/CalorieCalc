@@ -11,10 +11,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.caloriecalc.R
 import com.example.caloriecalc.data.Meal
+import com.example.caloriecalc.data.Product
 
 class MealAdapter (
     private val meals: MutableList<Meal>,
-    private val onAddProductClick: (Meal) -> Unit
+    private val onAddProductClick: (Meal) -> Unit,
+    private val onDeleteProductClick: (Meal, Product) -> Unit
 ) : RecyclerView.Adapter<MealAdapter.MealViewHolder>(){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MealViewHolder {
@@ -61,7 +63,9 @@ class MealAdapter (
             val rotationAngle = if (meal.isExpanded) 180f else 0f
             expandArrow.animate().rotation(rotationAngle).setDuration(200).start()
 
-            val productListAdapter = ProductListAdapter(meal.products)
+            val productListAdapter = ProductListAdapter(meal.products) { productToDelete ->
+                onDeleteProductClick(meal, productToDelete)
+            }
             productsRecyclerView.apply {
                 layoutManager = LinearLayoutManager(itemView.context)
                 adapter = productListAdapter

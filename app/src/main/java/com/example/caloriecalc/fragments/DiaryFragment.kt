@@ -49,6 +49,8 @@ class DiaryFragment : Fragment() {
     private lateinit var totalProteinTextView: TextView
     private lateinit var totalFatsTextView: TextView
     private lateinit var totalCarbsTextView: TextView
+    private var selectedDate: LocalDate = LocalDate.now()
+
 
     private val cachedWeek = mutableMapOf<LocalDate, Map<String, List<Product>>>()
     private val meals = mutableListOf( // Добавляем meals в поле класса, чтобы к нему можно было обращаться
@@ -218,19 +220,27 @@ class DiaryFragment : Fragment() {
     }
 
     private fun setupMealsRecyclerView() {
-        mealAdapter = MealAdapter(meals) { selectedMeal ->
-            val bundle = Bundle().apply {
-                putString("meal_name", selectedMeal.name)
+        mealAdapter = MealAdapter(
+            meals,
+            onAddProductClick = { selectedMeal ->
+                val bundle = Bundle().apply {
+                    putString("meal_name", selectedMeal.name)
+                }
+
+                // Переход к фрагменту выбора продуктов/рецептов
+                findNavController().navigate(
+                    R.id.action_diaryFragment_to_addToMealViewPagerFragment,
+                    bundle
+                )
+            },
+            onDeleteProductClick = { selectedMeal, product ->
+                // Удаление продукта через ViewModel
+                viewModel.removeProduct(selectedDate, selectedMeal.name, product)
             }
+        )
 
-            // Используем NavController для перехода с аргументами
-            findNavController().navigate(
-                R.id.action_diaryFragment_to_addToMealViewPagerFragment,
-                bundle
-            )
-        }
 
-        recyclerViewMeals.layoutManager = LinearLayoutManager(requireContext())
+    recyclerViewMeals.layoutManager = LinearLayoutManager(requireContext())
         recyclerViewMeals.adapter = mealAdapter
         recyclerViewMeals.isNestedScrollingEnabled = true
     }

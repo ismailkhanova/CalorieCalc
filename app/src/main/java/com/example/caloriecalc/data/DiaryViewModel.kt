@@ -184,7 +184,7 @@ class DiaryViewModel: ViewModel() {
     fun getNutrientUIModel(date: LocalDate, goalCalories: Int): NutrientUIModel {
         val summary = getNutrientSummaryForDate(date)
 
-        val calories = summary.calories.roundToInt()
+        val calories = summary.calories
         val protein = summary.protein
         val fats = summary.fats
         val carbs = summary.carbs
@@ -227,6 +227,31 @@ class DiaryViewModel: ViewModel() {
             usedKcalText,
             leftKcalText
         )
+    }
+
+    fun removeProduct(date: LocalDate, mealName: String, product: Product) {
+        val currentData = _foodData.value ?: return
+        val mealList = currentData[date]?.get(mealName) ?: return
+
+        mealList.remove(product)  // предполагаем, что у Product корректно реализован equals()
+
+        _foodData.value = currentData
+        cachedWeek[date] = currentData[date] ?: mutableMapOf()
+
+        // Поиск и удаление из Firebase
+        val dateKey = date.toString()
+        val mealRef = database.child("users").child(currentUserId)
+            .child("meals").child(dateKey).child(mealName)
+
+        mealRef.get().addOnSuccessListener { snapshot ->
+            snapshot.children.forEach { productSnapshot ->
+                val firebaseProduct = productSnapshot.getValue(Product::class.java)
+                if (firebaseProduct == product) {
+                    productSnapshot.ref.removeValue()
+                    return@forEach
+                }
+            }
+        }
     }
 
 
