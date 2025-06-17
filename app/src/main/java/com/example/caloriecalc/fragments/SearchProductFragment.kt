@@ -49,6 +49,12 @@ class SearchProductFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         cancelBtn = binding.findViewById(R.id.btnCancel)
 
+        // Hide the cancel button if the fragment is part of the ViewPager
+        val isFromViewPager = arguments?.getString("meal_name") != null
+        if (isFromViewPager) {
+            cancelBtn.visibility = View.GONE
+        }
+
         cancelBtn.setOnClickListener {
             findNavController().navigateUp() // Navigate back to previous fragment
         }

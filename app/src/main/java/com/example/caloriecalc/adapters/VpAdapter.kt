@@ -14,7 +14,7 @@ class VpAdapter(fragment: Fragment, private val mealName: String) : FragmentStat
         return when (position) {
             0 -> SearchProductFragment().apply {
                 arguments = Bundle().apply {
-                    putString("meal_name", mealName)
+                    putString("meal_name", mealName) // Pass meal_name to identify ViewPager context
                 }
             }
             1 -> RecipeFragment().apply {

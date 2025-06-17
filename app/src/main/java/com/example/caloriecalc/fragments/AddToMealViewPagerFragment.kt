@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.caloriecalc.R
@@ -26,6 +27,11 @@ class AddToMealViewPagerFragment : Fragment(R.layout.fragment_add_to_meal_view_p
 
         val viewPager = binding.viewPager
         val tabLayout = binding.tabLayout
+        val cancelBtn = binding.btnCancel
+
+        cancelBtn.setOnClickListener {
+            findNavController().navigateUp() // Navigate back to previous fragment
+        }
 
         viewPager.adapter = VpAdapter(this, mealName)
 

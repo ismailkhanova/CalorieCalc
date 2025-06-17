@@ -4,29 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.RadioGroup
 import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.caloriecalc.R
 import com.example.caloriecalc.data.ProfileViewModel
 import com.example.caloriecalc.data.UserProfile
+import com.example.caloriecalc.databinding.FragmentMyDataBinding
 
 class MyDataFragment : Fragment() {
 
-    private lateinit var spinnerGoal: Spinner
-    private lateinit var editTargetCalories: EditText
-    private lateinit var editWeight: EditText
-    private lateinit var textHeight: TextView
-    private lateinit var spinnerActivity: Spinner
-    private lateinit var buttonSave: Button
-    private lateinit var buttonRecalculate: Button
-    private lateinit var editAge: EditText
-    private lateinit var radioGroupGender: RadioGroup
+    private var _binding: FragmentMyDataBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var profileViewModel: ProfileViewModel
 
@@ -34,33 +25,29 @@ class MyDataFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_my_data, container, false)
-
-        spinnerGoal = view.findViewById(R.id.spinner_goal)
-        editTargetCalories = view.findViewById(R.id.edit_target_calories)
-        editWeight = view.findViewById(R.id.edit_weight)
-        textHeight = view.findViewById<TextView>(R.id.text_height) // Explicitly specify TextView type
-        spinnerActivity = view.findViewById(R.id.spinner_activity)
-        buttonSave = view.findViewById(R.id.button_save)
-        buttonRecalculate = view.findViewById(R.id.button_recalculate)
-        editAge = view.findViewById(R.id.edit_age)
-        radioGroupGender = view.findViewById(R.id.radio_group_gender)
+        _binding = FragmentMyDataBinding.inflate(inflater, container, false)
+        val view = binding.root
 
         profileViewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
+        binding.buttonBack.setOnClickListener{
+            findNavController().navigateUp()
+        }
 
         profileViewModel.userProfile.observe(viewLifecycleOwner) { profile ->
             profile?.let {
-                editAge.setText(it.age?.toString() ?: "")
+                binding.editAge.setText(it.age?.toString() ?: "")
                 if (it.gender == "Мужчина") {
-                    radioGroupGender.check(R.id.radio_male)
+                    binding.radioGroupGender.check(R.id.radio_male)
                 } else {
-                    radioGroupGender.check(R.id.radio_female)
+                    binding.radioGroupGender.check(R.id.radio_female)
                 }
-                spinnerGoal.setSelection(getSpinnerIndex(spinnerGoal, it.goal ?: ""))
-                editTargetCalories.setText(it.goalCalories?.toString() ?: "")
-                editWeight.setText(it.weight?.toString() ?: "")
-                textHeight.text = it.height?.toString() ?: ""
-                spinnerActivity.setSelection(getSpinnerIndex(spinnerActivity, activityLevelToString(it.activityLevel)))
+                binding.spinnerGoal.setSelection(getSpinnerIndex(binding.spinnerGoal, it.goal ?: ""))
+                binding.editTargetCalories.setText(it.goalCalories?.toString() ?: "")
+                binding.editWeight.setText(it.weight?.toString() ?: "")
+                binding.textHeight.setText(it.height?.toString() ?: "") // Исправлено
+                binding.spinnerActivity.setSelection(
+                    getSpinnerIndex(binding.spinnerActivity, activityLevelToString(it.activityLevel))
+                )
             }
         }
 
@@ -70,38 +57,42 @@ class MyDataFragment : Fragment() {
 
         profileViewModel.loadUserData()
 
-        buttonSave.setOnClickListener {
+        binding.buttonSave.setOnClickListener {
             val updatedProfile = UserProfile(
-                height = textHeight.text.toString().toIntOrNull(),
-                weight = editWeight.text.toString().toDoubleOrNull(),
-                age = editAge.text.toString().toIntOrNull(),
-                gender = if (radioGroupGender.checkedRadioButtonId == R.id.radio_male) "Мужчина" else "Женщина",
-                goal = spinnerGoal.selectedItem.toString(),
-                goalCalories = editTargetCalories.text.toString().toIntOrNull(),
-                activityLevel = stringToActivityLevel(spinnerActivity.selectedItem.toString())
+                height = binding.textHeight.text.toString().toIntOrNull(),
+                weight = binding.editWeight.text.toString().toDoubleOrNull(),
+                age = binding.editAge.text.toString().toIntOrNull(),
+                gender = if (binding.radioGroupGender.checkedRadioButtonId == R.id.radio_male) "Мужчина" else "Женщина",
+                goal = binding.spinnerGoal.selectedItem.toString(),
+                goalCalories = binding.editTargetCalories.text.toString().toIntOrNull(),
+                activityLevel = stringToActivityLevel(binding.spinnerActivity.selectedItem.toString())
             )
             profileViewModel.saveUserData(updatedProfile)
 
             Toast.makeText(requireContext(), "Данные успешно сохранены", Toast.LENGTH_SHORT).show()
         }
 
-        buttonRecalculate.setOnClickListener {
+        binding.buttonRecalculate.setOnClickListener {
             val updatedProfile = UserProfile(
-                height = textHeight.text.toString().toIntOrNull(),
-                weight = editWeight.text.toString().toDoubleOrNull(),
-                age = editAge.text.toString().toIntOrNull(),
-                gender = if (radioGroupGender.checkedRadioButtonId == R.id.radio_male) "Мужчина" else "Женщина",
-                goal = spinnerGoal.selectedItem.toString(),
-                activityLevel = stringToActivityLevel(spinnerActivity.selectedItem.toString())
+                height = binding.textHeight.text.toString().toIntOrNull(),
+                weight = binding.editWeight.text.toString().toDoubleOrNull(),
+                age = binding.editAge.text.toString().toIntOrNull(),
+                gender = if (binding.radioGroupGender.checkedRadioButtonId == R.id.radio_male) "Мужчина" else "Женщина",
+                goal = binding.spinnerGoal.selectedItem.toString(),
+                activityLevel = stringToActivityLevel(binding.spinnerActivity.selectedItem.toString())
             )
 
             val recalculatedCalories = profileViewModel.recalculateTargetCalories(updatedProfile)
-            editTargetCalories.setText(recalculatedCalories.toString())
+            binding.editTargetCalories.setText(recalculatedCalories.toString())
             Toast.makeText(requireContext(), "Калории пересчитаны", Toast.LENGTH_SHORT).show()
         }
 
-
         return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun getSpinnerIndex(spinner: Spinner, value: String): Int {
