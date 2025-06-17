@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import androidx.navigation.findNavController
 
 
 class ProfileFragment : Fragment() {
@@ -114,6 +115,10 @@ class ProfileFragment : Fragment() {
             logout()
 
         }
+
+        myData.setOnClickListener {
+            view.findNavController().navigate(R.id.action_profileFragment_to_myDataFragment)
+        }
     }
 
     private fun logout(){
@@ -123,4 +128,3 @@ class ProfileFragment : Fragment() {
         activity?.finish()
     }
 }
-

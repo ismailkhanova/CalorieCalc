@@ -1,0 +1,17 @@
+<resources>
+    <!-- ...existing code... -->
+
+    <string-array name="lifestyle_activity_options">
+        <item>Нет активности</item>
+        <item>Легкая активность</item>
+        <item>Умеренная активность</item>
+        <item>Интенсивная активность</item>
+        <item>Очень высокая активность</item>
+    </string-array>
+
+    <string-array name="goal_options">
+        <item>Похудение</item>
+        <item>Поддержание</item>
+        <item>Набор веса</item>
+    </string-array>
+</resources>

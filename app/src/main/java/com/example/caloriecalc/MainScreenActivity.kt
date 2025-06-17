@@ -7,16 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.NavigationUI.setupWithNavController
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.example.caloriecalc.databinding.ActivityMainBinding
 import com.example.caloriecalc.databinding.ActivityMainScreenBinding
-import com.example.caloriecalc.fragments.DiaryFragment
-import com.example.caloriecalc.fragments.ProfileFragment
-import com.example.caloriecalc.fragments.RecipeFragment
-import com.example.caloriecalc.fragments.StatisticFragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class MainScreenActivity : AppCompatActivity() {

@@ -13,7 +13,18 @@
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.example.caloriecalc.fragments.ProfileFragment"
-        android:label="ProfileFragment" />
+        android:label="ProfileFragment">
+    <action
+        android:id="@+id/action_profileFragment_to_myDataFragment"
+        app:destination="@id/myDataFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/myDataFragment"
+        android:name="com.example.caloriecalc.fragments.MyDataFragment"
+        android:label="MyDataFragment">
+
+    </fragment>
 
     <!-- Фрагмент для Дневника -->
     <fragment

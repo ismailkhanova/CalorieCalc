@@ -22,7 +22,7 @@
                 android:id="@+id/calories_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ваша суточная норма калорий для поддержания веса"
+                android:text="Ваша суточная норма калорий для выбранной цели"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="16dp"
@@ -79,13 +79,23 @@
             </RadioGroup>
 
             <!-- Кнопка "Начать", при нажатии переходит на главный экран -->
-            <Button
-                android:id="@+id/start_button"
-                android:layout_width="wrap_content"
+            <FrameLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Начать"
-                android:layout_marginTop="16dp"/>
+                android:layout_marginTop="16dp"
+                android:padding="8dp"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
+                <Button
+                    android:id="@+id/start_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:elevation="6dp"
+                    android:stateListAnimator="@null"
+                    android:text="Начать"
+                    android:backgroundTint="@color/blue"/>
+            </FrameLayout>
         </LinearLayout>
     </ScrollView>
 

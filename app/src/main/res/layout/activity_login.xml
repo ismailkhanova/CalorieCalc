@@ -5,23 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginHorizontal="10dp"
     tools:context=".registration_user.LoginActivity">
-
-<!--    &lt;!&ndash; Карточка с формой &ndash;&gt;-->
-<!--    <com.google.android.material.card.MaterialCardView-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        android:layout_margin="16dp"-->
-<!--        android:padding="16dp"-->
-<!--        app:cardElevation="2dp"-->
-<!--        app:cardCornerRadius="10dp"-->
-<!--        android:backgroundTint="@android:color/white">-->
-
-
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -80,7 +65,9 @@
                     android:layout_height="wrap_content"
                     android:text="Войти"
                     android:layout_margin="5dp"
-                    android:backgroundTint="#104AA8"
+                    android:elevation="4dp"
+                    android:stateListAnimator="@null"
+                    android:backgroundTint="@color/blue"
                     android:textColor="@android:color/white"
                     android:layout_marginTop="32dp"
                     android:fontFamily="sans-serif-medium" />

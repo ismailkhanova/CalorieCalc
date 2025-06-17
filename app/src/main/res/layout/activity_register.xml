@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:foregroundTint="#642C2C"
+    android:layout_marginHorizontal="10dp"
     tools:context=".registration_user.RegisterActivity">
 
 
@@ -95,7 +96,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
-                    android:backgroundTint="#104AA8"
+                    android:elevation="4dp"
+                    android:stateListAnimator="@null"
+                    android:backgroundTint="@color/blue"
                     android:fontFamily="sans-serif-medium"
                     android:text="Зарегистрироваться"
                     android:textColor="@android:color/white"
